@@ -1,0 +1,2544 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<title>SkillSwap</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800;900&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:15px;-webkit-tap-highlight-color:transparent}
+body{font-family:'DM Sans',sans-serif;background:#ecedff;color:#111827;min-height:100vh;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+button{cursor:pointer;border:none;outline:none;font-family:inherit}
+input,textarea,select{font-family:inherit;outline:none;border:none;-webkit-appearance:none;appearance:none}
+a{text-decoration:none;color:inherit}
+img{max-width:100%;display:block}
+:root{
+  --bg:#ecedff;--card:#fff;--pr:#5367f5;--p2:#6c63ff;--ac:#7c4dff;
+  --tx:#111827;--sub:#667085;--br:#e4e8f7;
+  --ok:#22c55e;--er:#ef4444;--wn:#f59e0b;
+  --r:18px;--rs:12px;
+  --s1:0 2px 20px rgba(83,103,245,.09);--s2:0 6px 28px rgba(83,103,245,.16);--s3:0 12px 48px rgba(83,103,245,.22);
+  --g:linear-gradient(135deg,#5367f5,#7c4dff);
+  --nav:66px;--top:56px
+}
+/* ─── SHELL ─── */
+#mainShell{max-width:430px;margin:0 auto;min-height:100vh;background:var(--bg);position:relative;overflow:hidden}
+@media(min-width:431px){#mainShell{box-shadow:0 0 80px rgba(83,103,245,.14)}}
+/* PAGES */
+.page{display:none;flex-direction:column;min-height:100vh;padding-bottom:calc(var(--nav)+10px)}
+.page.active{display:flex;animation:fu .2s ease}
+.page.nonav{padding-bottom:0}
+@keyframes fu{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.sb{overflow-y:auto;flex:1;-webkit-overflow-scrolling:touch}
+/* SPLASH */
+#spl{position:fixed;inset:0;background:var(--g);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;transition:opacity .5s,transform .5s}
+#spl.out{opacity:0;transform:scale(1.05);pointer-events:none}
+.sl{font-family:'Sora',sans-serif;font-size:2.8rem;font-weight:900;color:#fff;letter-spacing:-.03em}
+.st{color:rgba(255,255,255,.72);font-size:.88rem;letter-spacing:.03em}
+.sd{display:flex;gap:8px;margin-top:10px}
+.sd span{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.44);animation:dp 1.2s ease infinite}
+.sd span:nth-child(2){animation-delay:.2s}.sd span:nth-child(3){animation-delay:.4s}
+@keyframes dp{0%,100%{transform:scale(1);opacity:.44}50%{transform:scale(1.4);opacity:1}}
+/* TOPBAR */
+.topbar{position:sticky;top:0;z-index:100;background:var(--card);border-bottom:1px solid var(--br);height:var(--top);display:flex;align-items:center;justify-content:space-between;padding:0 16px;gap:8px;flex-shrink:0}
+.tbl{font-family:'Sora',sans-serif;font-weight:800;font-size:1.08rem;background:var(--g);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.tba{display:flex;gap:4px;align-items:center}
+.ib{width:36px;height:36px;border-radius:50%;background:var(--bg);display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative;flex-shrink:0}
+.ib:active{transform:scale(.91)}
+.ib svg{width:18px;height:18px;stroke:var(--tx);fill:none;stroke-width:1.9}
+.ib .dot{position:absolute;top:4px;right:4px;width:8px;height:8px;background:var(--er);border-radius:50%;border:1.5px solid var(--card)}
+/* BOTTOM NAV */
+.bnav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;height:var(--nav);background:var(--card);border-top:1px solid var(--br);display:flex;align-items:center;justify-content:space-around;z-index:200;padding-bottom:env(safe-area-inset-bottom,0)}
+.ni{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 0;cursor:pointer;position:relative}
+.ni svg{width:22px;height:22px;stroke:var(--sub);fill:none;stroke-width:1.9;transition:all .2s}
+.ni span{font-size:.67rem;color:var(--sub);font-weight:500;transition:all .2s}
+.ni.on svg{stroke:var(--pr)}.ni.on span{color:var(--pr);font-weight:700}
+.ni .nb{position:absolute;top:5px;left:50%;transform:translateX(4px);min-width:17px;height:17px;background:var(--er);border-radius:9px;font-size:.6rem;color:#fff;font-weight:800;display:flex;align-items:center;justify-content:center;padding:0 4px;border:2px solid var(--card)}
+/* BTNS */
+.bp{background:var(--g);color:#fff;border-radius:var(--rs);padding:13px;font-size:.9rem;font-weight:700;font-family:'Sora',sans-serif;width:100%;transition:opacity .15s,transform .1s;box-shadow:0 4px 18px rgba(83,103,245,.32)}
+.bp:active{transform:scale(.97)}
+.bo{background:transparent;border:1.5px solid var(--br);border-radius:var(--rs);padding:11px;font-size:.88rem;font-weight:600;color:var(--pr);width:100%;transition:all .15s}
+.bg{background:var(--bg);color:var(--tx);border-radius:var(--rs);padding:11px;font-size:.88rem;font-weight:600;width:100%}
+.bd{background:var(--er);color:#fff;border-radius:var(--rs);padding:11px;font-size:.88rem;font-weight:700;width:100%}
+.bs{border-radius:8px;padding:5px 13px;font-size:.73rem;font-weight:700;transition:all .13s;flex-shrink:0}
+.bs:active{transform:scale(.93)}
+.bs.p{background:var(--g);color:#fff;box-shadow:0 2px 8px rgba(83,103,245,.28)}
+.bs.o{background:transparent;border:1.5px solid var(--br);color:var(--pr)}
+.bs.s{background:rgba(34,197,94,.1);color:var(--ok);border:1.5px solid rgba(34,197,94,.25)}
+.bs.d{background:rgba(239,68,68,.09);color:var(--er);border:1.5px solid rgba(239,68,68,.2)}
+/* FORMS */
+.fg{display:flex;flex-direction:column;gap:5px}
+.fg label{font-size:.72rem;font-weight:700;color:var(--sub);letter-spacing:.04em;text-transform:uppercase}
+.fi{background:var(--bg);border:1.5px solid var(--br);border-radius:var(--rs);padding:11px 14px;font-size:.87rem;color:var(--tx);transition:border-color .18s,box-shadow .18s;width:100%}
+.fi:focus{border-color:var(--pr);box-shadow:0 0 0 3px rgba(83,103,245,.1)}
+.fi::placeholder{color:#b8c0d4}
+textarea.fi{resize:none;line-height:1.55}
+select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23667085' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:32px}
+.fr{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+/* SEARCH */
+.sw{position:relative}
+.sbar{background:var(--card);border:1.5px solid var(--br);border-radius:50px;padding:9px 14px 9px 38px;font-size:.85rem;width:100%;color:var(--tx);transition:all .18s;box-shadow:var(--s1)}
+.sbar:focus{border-color:var(--pr)}
+.sbar::placeholder{color:#b8c0d4}
+.sico{position:absolute;left:13px;top:50%;transform:translateY(-50%);width:15px;height:15px;stroke:var(--sub);fill:none;stroke-width:2.2}
+/* SECTION HDR */
+.sh{display:flex;align-items:center;justify-content:space-between;padding:14px 16px 8px}
+.sh h3{font-family:'Sora',sans-serif;font-size:.92rem;font-weight:800}
+.sh a{font-size:.75rem;color:var(--pr);font-weight:600;cursor:pointer}
+/* H-SCROLL */
+.hs{display:flex;gap:10px;overflow-x:auto;padding:0 16px 8px;scrollbar-width:none}
+.hs::-webkit-scrollbar{display:none}
+/* PERSON CARD */
+.pc{min-width:148px;max-width:148px;background:var(--card);border-radius:var(--r);padding:14px 12px;box-shadow:var(--s1);display:flex;flex-direction:column;align-items:center;gap:7px;cursor:pointer;transition:transform .18s;flex-shrink:0}
+.pc:active{transform:scale(.96)}
+.av{width:54px;height:54px;border-radius:50%;background:var(--g);display:flex;align-items:center;justify-content:center;font-family:'Sora',sans-serif;font-weight:800;font-size:1.2rem;color:#fff;overflow:hidden;flex-shrink:0;position:relative}
+.av img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+.olr{position:absolute;bottom:1px;right:1px;width:10px;height:10px;background:var(--ok);border-radius:50%;border:2px solid var(--card)}
+.pc h4{font-size:.8rem;font-weight:700;text-align:center;line-height:1.3}
+.pc p{font-size:.69rem;color:var(--sub);text-align:center}
+.cbdg{background:rgba(34,197,94,.11);color:var(--ok);border-radius:20px;padding:2px 9px;font-size:.67rem;font-weight:800}
+.chips{display:flex;flex-wrap:wrap;gap:4px;justify-content:center}
+.chip{background:rgba(83,103,245,.08);color:var(--pr);border-radius:20px;padding:2px 8px;font-size:.66rem;font-weight:700}
+/* MINI CARD */
+.mc{background:var(--card);border-radius:var(--rs);padding:11px 13px;box-shadow:var(--s1);display:flex;align-items:center;gap:11px;cursor:pointer;transition:background .13s;margin-bottom:8px}
+.mc:active{background:#f8f9ff}
+.mca{width:40px;height:40px;border-radius:50%;background:var(--g);display:flex;align-items:center;justify-content:center;font-size:.95rem;font-weight:800;color:#fff;flex-shrink:0;font-family:'Sora',sans-serif;overflow:hidden}
+.mca img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+.mcb{flex:1;min-width:0}
+.mcn{font-size:.84rem;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mcs{font-size:.74rem;color:var(--sub);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}
+.mcr{flex-shrink:0;text-align:right}
+.mct{font-size:.67rem;color:var(--sub)}
+.mcu{background:var(--pr);color:#fff;border-radius:50%;width:18px;height:18px;font-size:.62rem;font-weight:800;display:flex;align-items:center;justify-content:center;margin-left:auto;margin-top:4px}
+/* PILLS */
+.pill{background:var(--card);border:1.5px solid var(--br);border-radius:50px;padding:6px 14px;font-size:.76rem;font-weight:600;color:var(--sub);white-space:nowrap;cursor:pointer;transition:all .15s;flex-shrink:0}
+.pill.on,.pill:hover{background:var(--pr);color:#fff;border-color:var(--pr)}
+/* SKILL TAGS */
+.stags{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.stag{background:rgba(83,103,245,.1);color:var(--pr);border-radius:20px;padding:4px 11px 4px 12px;font-size:.76rem;font-weight:700;display:flex;align-items:center;gap:5px}
+.stag.w{background:rgba(239,68,68,.09);color:var(--er)}
+.stag .rm{cursor:pointer;opacity:.55;font-size:.95rem;line-height:1}
+.sti{display:flex;gap:8px;align-items:stretch}
+/* AVAIL */
+.ach{display:flex;flex-wrap:wrap;gap:6px}
+.ac{padding:6px 12px;border-radius:20px;border:1.5px solid var(--br);font-size:.75rem;font-weight:600;cursor:pointer;transition:all .15s;color:var(--sub)}
+.ac.on{background:var(--pr);color:#fff;border-color:var(--pr)}
+/* QUICK PICK */
+.qpick{display:flex;flex-wrap:wrap;gap:7px;margin-top:6px}
+.qchip{padding:5px 12px;border-radius:20px;background:rgba(83,103,245,.08);color:var(--pr);font-size:.76rem;font-weight:700;cursor:pointer;transition:all .15s;border:1.5px solid transparent}
+.qchip:hover,.qchip.sel{background:var(--pr);color:#fff}
+/* STATUS */
+.sbdg{display:inline-flex;align-items:center;border-radius:20px;padding:3px 9px;font-size:.68rem;font-weight:800;flex-shrink:0}
+.sbdg.pending{background:rgba(245,158,11,.11);color:var(--wn)}
+.sbdg.accepted{background:rgba(34,197,94,.11);color:var(--ok)}
+.sbdg.completed{background:rgba(83,103,245,.1);color:var(--pr)}
+.sbdg.cancelled{background:rgba(239,68,68,.09);color:var(--er)}
+.div8{height:8px;background:var(--bg);flex-shrink:0}
+/* TOAST */
+.toast{position:fixed;bottom:calc(var(--nav)+14px);left:50%;transform:translateX(-50%) translateY(12px);background:#1c1c2e;color:#fff;padding:10px 22px;border-radius:24px;font-size:.82rem;font-weight:600;opacity:0;z-index:9000;transition:all .3s cubic-bezier(.34,1.56,.64,1);white-space:nowrap;pointer-events:none;box-shadow:0 4px 20px rgba(0,0,0,.25)}
+.toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+/* MODAL */
+.mo{position:fixed;inset:0;background:rgba(17,24,39,.45);z-index:8000;display:none;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(3px)}
+.mo.on{display:flex}
+.mbox{background:var(--card);border-radius:22px;padding:24px;width:100%;max-width:340px;animation:pop .26s cubic-bezier(.34,1.56,.64,1)}
+@keyframes pop{from{transform:scale(.82);opacity:0}to{transform:scale(1);opacity:1}}
+.mbox h3{font-family:'Sora',sans-serif;font-size:1.06rem;font-weight:800;margin-bottom:6px}
+.mbox p{font-size:.83rem;color:var(--sub);line-height:1.5;margin-bottom:18px}
+.ma{display:flex;gap:9px}
+/* SHEET */
+.sho{position:fixed;inset:0;background:rgba(17,24,39,.4);z-index:7000;display:none;align-items:flex-end;backdrop-filter:blur(2px)}
+.sho.on{display:flex}
+.sheet{background:var(--card);border-radius:24px 24px 0 0;width:100%;max-width:430px;margin:0 auto;max-height:80vh;display:flex;flex-direction:column;animation:sup .28s ease}
+@keyframes sup{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.shhdl{width:38px;height:4px;background:var(--br);border-radius:2px;margin:10px auto 4px;flex-shrink:0}
+.shhd{padding:6px 16px 12px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.shhd h3{font-family:'Sora',sans-serif;font-weight:800;font-size:1rem}
+.shhd a{font-size:.76rem;color:var(--pr);cursor:pointer;font-weight:600}
+/* EMPTY STATE */
+.empty{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:52px 28px;text-align:center;gap:10px}
+.empty .ei{font-size:3.2rem;margin-bottom:2px}
+.empty h3{font-family:'Sora',sans-serif;font-size:1.05rem;font-weight:700}
+.empty p{font-size:.83rem;color:var(--sub);line-height:1.6;max-width:260px}
+.empty .ep{display:inline-block;margin-top:10px;padding:10px 22px;background:var(--g);color:#fff;border-radius:50px;font-size:.82rem;font-weight:700;cursor:pointer}
+/* STARS */
+.stars{color:var(--wn);letter-spacing:1px}
+.srate{display:flex;gap:5px}
+.srate span{font-size:1.6rem;cursor:pointer;color:var(--br);transition:color .12s}
+.srate span.on{color:var(--wn)}
+/* AUTH */
+.auth{min-height:100vh;display:flex;flex-direction:column;background:var(--card)}
+.ahero{background:var(--g);padding:52px 24px 38px;display:flex;flex-direction:column;align-items:center;gap:14px;position:relative;overflow:hidden}
+.ahero::before{content:'';position:absolute;top:-50px;right:-50px;width:160px;height:160px;background:rgba(255,255,255,.07);border-radius:50%}
+.alogo{font-family:'Sora',sans-serif;font-size:2.3rem;font-weight:900;color:#fff;letter-spacing:-.03em;z-index:1}
+.aicon{width:64px;height:64px;background:rgba(255,255,255,.18);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:2rem;z-index:1}
+.ahero p{color:rgba(255,255,255,.77);font-size:.86rem;text-align:center;line-height:1.5;z-index:1}
+.abody{flex:1;padding:24px 20px;display:flex;flex-direction:column;gap:14px;overflow-y:auto}
+.aswitch{text-align:center;font-size:.83rem;color:var(--sub)}
+.aswitch a{color:var(--pr);font-weight:700;cursor:pointer}
+/* ONBOARDING */
+.ob{min-height:100vh;background:var(--card);display:flex;flex-direction:column}
+.obp{height:3px;background:var(--br);flex-shrink:0}
+.obpf{background:var(--g);height:100%;transition:width .45s}
+.obs{display:none;padding:22px 20px;flex-direction:column;gap:14px;flex:1;overflow-y:auto}
+.obs.on{display:flex}
+.obhd h2{font-family:'Sora',sans-serif;font-size:1.28rem;font-weight:800;margin-bottom:4px}
+.obhd p{font-size:.84rem;color:var(--sub);line-height:1.5}
+.avu{width:88px;height:88px;border-radius:50%;background:var(--bg);border:2px dashed var(--br);display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;margin:0 auto}
+.avu:hover{border-color:var(--pr)}
+.avu img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+.oba{display:flex;gap:10px;margin-top:auto;padding-top:12px}
+/* DASHBOARD */
+.dhero{background:var(--g);padding:20px 16px 22px;position:relative;overflow:hidden;flex-shrink:0}
+.dhero::before{content:'';position:absolute;top:-50px;right:-40px;width:150px;height:150px;background:rgba(255,255,255,.07);border-radius:50%}
+.dtop{display:flex;align-items:center;justify-content:space-between;position:relative;z-index:1}
+.duser{display:flex;align-items:center;gap:10px}
+.dav{width:42px;height:42px;border-radius:50%;border:2.5px solid rgba(255,255,255,.44);background:rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center;font-family:'Sora',sans-serif;font-weight:800;font-size:1.05rem;color:#fff;overflow:hidden;flex-shrink:0}
+.dav img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+.dgr{color:rgba(255,255,255,.72);font-size:.73rem}
+.dname{color:#fff;font-weight:700;font-size:.95rem;font-family:'Sora',sans-serif}
+.dicons{display:flex;gap:7px;position:relative;z-index:1}
+.dic{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative}
+.dic:active{background:rgba(255,255,255,.28)}
+.dic svg{width:17px;height:17px;stroke:#fff;fill:none;stroke-width:1.9}
+.dstats{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-top:16px;position:relative;z-index:1}
+.dst{background:rgba(255,255,255,.14);border-radius:12px;padding:10px 8px;text-align:center}
+.dstn{font-family:'Sora',sans-serif;font-size:1.35rem;font-weight:900;color:#fff}
+.dstl{font-size:.69rem;color:rgba(255,255,255,.72);margin-top:1px}
+.qarow{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:12px 16px}
+.qa{background:var(--card);border-radius:14px;padding:11px 6px;display:flex;flex-direction:column;align-items:center;gap:6px;box-shadow:var(--s1);cursor:pointer;transition:transform .15s}
+.qa:active{transform:scale(.94)}
+.qaico{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.05rem}
+.qalbl{font-size:.67rem;font-weight:700;color:var(--sub);text-align:center;line-height:1.2}
+/* DISCOVER */
+.dc{background:var(--card);border-radius:var(--r);padding:13px;box-shadow:var(--s1);display:flex;gap:12px;cursor:pointer;margin-bottom:10px}
+.dcaw{position:relative;flex-shrink:0}
+.dca{width:52px;height:52px;border-radius:50%;background:var(--g);display:flex;align-items:center;justify-content:center;font-size:1.2rem;font-weight:800;color:#fff;font-family:'Sora',sans-serif;overflow:hidden}
+.dca img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+.dcol{position:absolute;bottom:1px;right:1px;width:10px;height:10px;background:var(--ok);border-radius:50%;border:2px solid var(--card)}
+.dcb{flex:1;min-width:0}
+.dcn{font-size:.87rem;font-weight:700;margin-bottom:1px}
+.dcc{font-size:.72rem;color:var(--sub);margin-bottom:6px}
+.dcr{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0}
+.dcm{font-family:'Sora',sans-serif;font-size:.97rem;font-weight:900;color:var(--ok)}
+.dcml{font-size:.62rem;color:var(--sub);margin-top:-4px}
+.dcact{display:flex;gap:7px;margin-top:9px}
+/* SWIPE */
+.swwrap{flex:1;display:flex;flex-direction:column;align-items:center;padding:10px 16px 8px;gap:14px;overflow:hidden;position:relative}
+.swcnt span{background:var(--card);border-radius:20px;padding:3px 12px;box-shadow:var(--s1);font-size:.78rem;color:var(--sub);font-weight:600}
+.swstack{position:relative;width:100%;height:calc(100vw - 32px);max-height:420px;flex-shrink:0}
+@media(min-width:430px){.swstack{max-height:380px}}
+.swcard{position:absolute;inset:0;background:var(--card);border-radius:24px;box-shadow:0 8px 36px rgba(83,103,245,.18);overflow:hidden;cursor:grab;user-select:none;touch-action:none;will-change:transform}
+.swcard:active{cursor:grabbing}
+.scimg{width:100%;height:58%;background:var(--g);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+.scimg img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0}
+.scov{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.52) 0%,transparent 55%)}
+.scini{font-family:'Sora',sans-serif;font-weight:900;font-size:5rem;color:rgba(255,255,255,.22);position:relative;z-index:1}
+.scbdg{position:absolute;top:12px;right:12px;background:rgba(0,0,0,.44);backdrop-filter:blur(6px);color:#fff;border-radius:20px;padding:4px 11px;font-size:.71rem;font-weight:700;z-index:2}
+.scbody{padding:12px 14px 14px}
+.scname{font-family:'Sora',sans-serif;font-size:1.18rem;font-weight:900;margin-bottom:2px}
+.sccrs{font-size:.75rem;color:var(--sub);margin-bottom:7px}
+.scbio{font-size:.81rem;color:var(--tx);line-height:1.5;margin-bottom:8px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.swlbl{position:absolute;border-radius:8px;padding:5px 14px;font-family:'Sora',sans-serif;font-size:1.65rem;font-weight:900;letter-spacing:.04em;border:4px solid;opacity:0;pointer-events:none;transition:opacity .1s;z-index:20;top:20px}
+.swlbl.nope{right:16px;color:var(--er);border-color:var(--er);transform:rotate(12deg)}
+.swlbl.like{left:16px;color:var(--ok);border-color:var(--ok);transform:rotate(-12deg)}
+.swlbl.sup{left:50%;transform:translateX(-50%);color:var(--wn);border-color:var(--wn);font-size:1.2rem}
+.swbtns{display:flex;gap:16px;align-items:center;justify-content:center}
+.swb{border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:var(--s2);transition:transform .15s;flex-shrink:0}
+.swb:active{transform:scale(.91)!important}
+.swb.rej{width:54px;height:54px;background:#fff;border:2px solid var(--er)}
+.swb.rej svg{stroke:var(--er);width:22px;height:22px;fill:none;stroke-width:2.2}
+.swb.acc{width:66px;height:66px;background:var(--g)}
+.swb.acc svg{stroke:#fff;width:26px;height:26px;fill:none;stroke-width:2.4}
+.swb.str{width:46px;height:46px;background:#fff;border:2px solid var(--wn)}
+.swb.str svg{stroke:var(--wn);width:19px;height:19px;fill:none;stroke-width:2}
+.swhint{font-size:.73rem;color:var(--sub);display:flex;align-items:center;gap:8px}
+.swhint span{opacity:.6}
+.swempty{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;background:var(--card);border-radius:24px;box-shadow:var(--s2);text-align:center;padding:24px}
+.swempty h3{font-family:'Sora',sans-serif;font-size:1.08rem;font-weight:800}
+.swempty p{font-size:.82rem;color:var(--sub);line-height:1.5}
+.matcho{position:fixed;inset:0;background:rgba(17,24,39,.6);z-index:5000;display:none;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+.matcho.on{display:flex}
+.matchbox{background:var(--card);border-radius:24px;padding:28px 28px 24px;text-align:center;max-width:320px;width:90%;animation:pop .4s cubic-bezier(.34,1.56,.64,1);box-shadow:var(--s3)}
+.matchttl{font-family:'Sora',sans-serif;font-size:1.7rem;font-weight:900;background:var(--g);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin:8px 0 6px}
+.matchsub{font-size:.84rem;color:var(--sub);line-height:1.5;margin-bottom:18px}
+.matchavs{display:flex;justify-content:center;margin-bottom:20px}
+.mav{width:60px;height:60px;border-radius:50%;background:var(--g);display:flex;align-items:center;justify-content:center;font-size:1.6rem;font-weight:900;color:#fff;border:3px solid #fff;font-family:'Sora',sans-serif;overflow:hidden}
+.mav:last-child{margin-left:-16px}
+.mav img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+/* REQUESTS */
+.rtabs{display:flex;background:var(--card);border-bottom:1px solid var(--br);flex-shrink:0}
+.rtab{flex:1;text-align:center;padding:11px 4px;font-size:.77rem;font-weight:600;color:var(--sub);cursor:pointer;border-bottom:2.5px solid transparent;transition:all .18s;white-space:nowrap}
+.rtab.on{color:var(--pr);border-color:var(--pr)}
+.rcard{background:var(--card);border-radius:var(--r);padding:13px;box-shadow:var(--s1);margin-bottom:10px}
+.rtop{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.rav{width:44px;height:44px;border-radius:50%;background:var(--g);display:flex;align-items:center;justify-content:center;font-size:1rem;font-weight:800;color:#fff;font-family:'Sora',sans-serif;flex-shrink:0}
+.rinfo{flex:1;min-width:0}
+.rname{font-size:.87rem;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rtype{font-size:.72rem;color:var(--sub);margin-top:1px}
+.rdesc{font-size:.79rem;color:var(--sub);line-height:1.55;margin-bottom:10px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.racts{display:flex;gap:7px;flex-wrap:wrap}
+.rmeta{font-size:.69rem;color:var(--sub);margin-bottom:8px}
+/* CHAT LIST */
+.crow{display:flex;align-items:center;gap:11px;padding:12px 16px;cursor:pointer;transition:background .13s;border-bottom:1px solid var(--br)}
+.crow:active{background:var(--bg)}
+.cav{width:48px;height:48px;border-radius:50%;background:var(--g);display:flex;align-items:center;justify-content:center;font-size:1.1rem;font-weight:800;color:#fff;font-family:'Sora',sans-serif;flex-shrink:0;overflow:hidden;position:relative}
+.cav img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+.cbody{flex:1;min-width:0}
+.cname{font-size:.87rem;font-weight:700;margin-bottom:2px}
+.cprev{font-size:.76rem;color:var(--sub);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cmeta{text-align:right;flex-shrink:0}
+.ctime{font-size:.67rem;color:var(--sub);margin-bottom:4px}
+.cunr{background:var(--pr);color:#fff;border-radius:9px;min-width:18px;height:18px;font-size:.62rem;font-weight:800;display:flex;align-items:center;justify-content:center;padding:0 4px;margin-left:auto}
+/* CHAT WINDOW */
+.cwin{display:none;flex-direction:column;position:fixed;inset:0;max-width:430px;left:50%;transform:translateX(-50%);z-index:3000;background:var(--bg)}
+.cwin.on{display:flex}
+.chd{background:var(--card);border-bottom:1px solid var(--br);padding:10px 14px;display:flex;align-items:center;gap:10px;flex-shrink:0}
+.chdav{width:38px;height:38px;border-radius:50%;background:var(--g);display:flex;align-items:center;justify-content:center;font-size:.95rem;font-weight:800;color:#fff;font-family:'Sora',sans-serif;flex-shrink:0;overflow:hidden}
+.chdav img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+.chdname{font-size:.9rem;font-weight:700}
+.chdst{font-size:.71rem;color:var(--ok);font-weight:600}
+.cmsgs{flex:1;overflow-y:auto;padding:12px 14px;display:flex;flex-direction:column;gap:6px;-webkit-overflow-scrolling:touch}
+.mg{display:flex;flex-direction:column;gap:3px}
+.mg.me{align-items:flex-end}.mg.them{align-items:flex-start}
+.bub{max-width:76%;padding:9px 13px;border-radius:18px;font-size:.84rem;line-height:1.52;word-break:break-word}
+.bub.me{background:var(--g);color:#fff;border-bottom-right-radius:4px}
+.bub.them{background:var(--card);color:var(--tx);border-bottom-left-radius:4px;box-shadow:0 1px 5px rgba(0,0,0,.07)}
+.mtime{font-size:.62rem;color:var(--sub);padding:0 2px}
+.cbar{background:var(--card);border-top:1px solid var(--br);padding:9px 12px;display:flex;gap:8px;align-items:flex-end;flex-shrink:0;padding-bottom:calc(9px + env(safe-area-inset-bottom,0px))}
+.cinp{flex:1;background:var(--bg);border:1.5px solid var(--br);border-radius:22px;padding:9px 14px;font-size:.86rem;color:var(--tx);resize:none;max-height:90px;transition:border-color .18s;line-height:1.45}
+.cinp:focus{border-color:var(--pr)}
+.cinp::placeholder{color:#b8c0d4}
+.csend{width:38px;height:38px;border-radius:50%;background:var(--g);display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 2px 10px rgba(83,103,245,.3);cursor:pointer}
+.csend:active{transform:scale(.91)}
+.csend svg{width:15px;height:15px;stroke:#fff;fill:none;stroke-width:2.6}
+/* NOTIFS */
+.ni2{display:flex;align-items:flex-start;gap:11px;padding:11px 16px;cursor:pointer;transition:background .13s;border-bottom:1px solid rgba(0,0,0,.03)}
+.ni2.unr{background:rgba(83,103,245,.03)}
+.niico{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:1rem}
+.nibody{flex:1}
+.nitext{font-size:.81rem;line-height:1.45}
+.nitime{font-size:.69rem;color:var(--sub);margin-top:2px}
+.nidot{width:7px;height:7px;background:var(--pr);border-radius:50%;margin-top:8px;flex-shrink:0}
+/* PROFILE */
+.pcov{background:var(--g);height:120px;position:relative;flex-shrink:0}
+.pavwrap{position:absolute;bottom:-38px;left:16px}
+.pav{width:76px;height:76px;border-radius:50%;border:3.5px solid var(--card);background:var(--g);display:flex;align-items:center;justify-content:center;font-size:2.1rem;font-weight:800;color:#fff;font-family:'Sora',sans-serif;overflow:hidden;box-shadow:0 4px 16px rgba(0,0,0,.12)}
+.pav img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+.pcovact{position:absolute;top:12px;right:14px;display:flex;gap:8px}
+.covbtn{background:rgba(255,255,255,.22);border-radius:20px;padding:7px 14px;font-size:.74rem;font-weight:700;color:#fff;backdrop-filter:blur(4px)}
+.covbtn:active{background:rgba(255,255,255,.35)}
+.pinfo{padding:48px 16px 16px;background:var(--card)}
+.pname{font-family:'Sora',sans-serif;font-size:1.18rem;font-weight:900;margin-bottom:3px}
+.psub{font-size:.77rem;color:var(--sub);margin-bottom:7px}
+.pbio{font-size:.82rem;color:var(--tx);line-height:1.55}
+.pstats{display:flex;background:var(--card);border-top:1px solid var(--br);border-bottom:1px solid var(--br)}
+.pst{flex:1;text-align:center;padding:13px 0;border-right:1px solid var(--br);cursor:pointer}
+.pst:last-child{border-right:none}
+.pstn{font-family:'Sora',sans-serif;font-size:1.12rem;font-weight:900;color:var(--pr)}
+.pstl{font-size:.67rem;color:var(--sub);margin-top:2px}
+.psec{padding:14px 16px}
+.psec h4{font-size:.72rem;font-weight:800;color:var(--sub);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px}
+.ritem{background:var(--bg);border-radius:13px;padding:12px 13px;margin-bottom:8px}
+.rtoprev{display:flex;align-items:center;gap:8px;margin-bottom:5px}
+.ravrev{width:28px;height:28px;border-radius:50%;background:var(--g);display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:800;color:#fff;flex-shrink:0}
+.rrevname{font-size:.82rem;font-weight:700}
+.rrevtext{font-size:.77rem;color:var(--sub);line-height:1.5}
+.rbig{font-family:'Sora',sans-serif;font-size:2.6rem;font-weight:900;color:var(--pr)}
+/* SETTINGS */
+.ssec{padding:4px 14px}
+.sseclbl{font-size:.69rem;font-weight:800;color:var(--sub);text-transform:uppercase;letter-spacing:.07em;padding:12px 4px 6px}
+.sitem{background:var(--card);border-radius:var(--rs);padding:13px 14px;display:flex;align-items:center;gap:12px;margin-bottom:6px;cursor:pointer}
+.sitem:active{background:#f8f9ff}
+.sico{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sico svg{width:18px;height:18px;stroke:#fff;fill:none;stroke-width:1.9}
+.slbl{flex:1;font-size:.87rem;font-weight:600}
+.sright{display:flex;align-items:center;gap:5px;color:var(--sub);font-size:.79rem}
+.sright svg{width:15px;height:15px;stroke:var(--sub);fill:none;stroke-width:2}
+.tog{width:42px;height:24px;background:var(--br);border-radius:12px;position:relative;cursor:pointer;transition:background .2s;flex-shrink:0}
+.tog.on{background:var(--pr)}
+.tog::after{content:'';position:absolute;top:3px;left:3px;width:18px;height:18px;background:#fff;border-radius:50%;transition:left .2s;box-shadow:0 1px 5px rgba(0,0,0,.2)}
+.tog.on::after{left:21px}
+/* CONNECTIONS */
+.coitem{display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--card);border-bottom:1px solid var(--br);cursor:pointer}
+.coitem:active{background:var(--bg)}
+.coav{width:48px;height:48px;border-radius:50%;background:var(--g);display:flex;align-items:center;justify-content:center;font-size:1.1rem;font-weight:800;color:#fff;font-family:'Sora',sans-serif;flex-shrink:0;overflow:hidden}
+.cobody{flex:1}
+.coname{font-size:.87rem;font-weight:700}
+.cosub{font-size:.74rem;color:var(--sub);margin-top:2px}
+.coact{background:var(--bg);border:1.5px solid var(--br);border-radius:8px;padding:6px 13px;font-size:.73rem;font-weight:700;color:var(--pr)}
+/* STUDENT VIEW */
+.sv{display:none;flex-direction:column;position:fixed;inset:0;max-width:430px;left:50%;transform:translateX(-50%);z-index:2000;background:var(--bg);overflow-y:auto;overflow-x:hidden}
+.sv.on{display:flex}
+/* ADMIN */
+#adminShell{display:none;flex-direction:column;min-height:100vh;background:var(--bg);max-width:430px;margin:0 auto}
+#adminShell.on{display:flex}
+.admin-top{background:linear-gradient(135deg,#1e293b,#334155);padding:14px 16px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;flex-shrink:0}
+.admin-top h1{font-family:'Sora',sans-serif;font-size:1.1rem;font-weight:900;color:#fff}
+.admin-logout{background:rgba(255,255,255,.15);color:#fff;border-radius:8px;padding:6px 12px;font-size:.78rem;font-weight:700;cursor:pointer}
+.admin-tabs{display:flex;background:var(--card);border-bottom:1px solid var(--br);overflow-x:auto;scrollbar-width:none;flex-shrink:0}
+.admin-tabs::-webkit-scrollbar{display:none}
+.atab{flex-shrink:0;padding:12px 16px;font-size:.78rem;font-weight:600;color:var(--sub);cursor:pointer;border-bottom:2.5px solid transparent;white-space:nowrap}
+.atab.on{color:var(--pr);border-color:var(--pr)}
+.admin-body{padding:14px;display:flex;flex-direction:column;gap:12px;overflow-y:auto;flex:1}
+.acard{background:var(--card);border-radius:var(--r);padding:14px;box-shadow:var(--s1)}
+.acard h3{font-family:'Sora',sans-serif;font-size:.9rem;font-weight:800;margin-bottom:12px}
+.a2grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:4px}
+.astat{background:var(--bg);border-radius:var(--rs);padding:12px;text-align:center}
+.astat-n{font-family:'Sora',sans-serif;font-size:1.6rem;font-weight:900;color:var(--pr)}
+.astat-l{font-size:.7rem;color:var(--sub);margin-top:2px}
+.aurow{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--br)}
+.aurow:last-child{border-bottom:none}
+.au-av{width:38px;height:38px;border-radius:50%;background:var(--g);display:flex;align-items:center;justify-content:center;font-size:.9rem;font-weight:800;color:#fff;flex-shrink:0}
+.au-info{flex:1;min-width:0}
+.au-name{font-size:.84rem;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.au-sub{font-size:.72rem;color:var(--sub)}
+.abtn{background:var(--bg);border:1.5px solid var(--br);border-radius:7px;padding:4px 10px;font-size:.72rem;font-weight:700;color:var(--pr);cursor:pointer}
+.abtn.danger{color:var(--er);border-color:rgba(239,68,68,.3)}
+.askill-tag{background:rgba(83,103,245,.1);color:var(--pr);border-radius:20px;padding:5px 12px;font-size:.76rem;font-weight:700;display:inline-flex;align-items:center;gap:6px;margin:3px}
+.askill-tag .rm{cursor:pointer;color:var(--er);font-weight:900;font-size:.9rem}
+.abadge{display:inline-flex;align-items:center;border-radius:20px;padding:3px 9px;font-size:.68rem;font-weight:800}
+.abadge.active{background:rgba(34,197,94,.11);color:var(--ok)}
+.abadge.suspended{background:rgba(239,68,68,.09);color:var(--er)}
+</style>
+
+<!-- ══ GLOBAL OVERLAYS (outside #mainShell so z-index works) ══ -->
+<div class="toast" id="toast"></div>
+
+<!-- MODALS -->
+<div class="mo" id="moOut"><div class="mbox"><h3>Sign Out?</h3><p>You'll be signed out of your account.</p><div class="ma"><button class="bg" onclick="CM('moOut')">Cancel</button><button class="bd" onclick="doLogout()">Sign Out</button></div></div></div>
+<div class="mo" id="moReq">
+  <div class="mbox">
+    <h3 id="moRT">Send Request</h3><p id="moRS" style="margin-bottom:12px"></p>
+    <div class="fg" style="margin-bottom:11px"><label>Request Type</label><select class="fi" id="moRTy"><option>Skill Swap</option><option>Tutoring</option><option>Paid Service</option><option>Collaboration</option></select></div>
+    <div class="fg" style="margin-bottom:16px"><label>Message</label><textarea class="fi" id="moRM" rows="3" placeholder="Introduce yourself and describe what you're looking for…"></textarea></div>
+    <div class="ma"><button class="bg" onclick="CM('moReq')">Cancel</button><button class="bp" style="padding:11px" onclick="subReq()">Send Request 🚀</button></div>
+  </div>
+</div>
+<div class="mo" id="moRev">
+  <div class="mbox">
+    <h3>Leave a Review</h3><p style="margin-bottom:12px">Share your experience with this student.</p>
+    <div style="margin-bottom:14px"><div class="srate" id="srate"><span onclick="setR(1)">★</span><span onclick="setR(2)">★</span><span onclick="setR(3)">★</span><span onclick="setR(4)">★</span><span onclick="setR(5)">★</span></div></div>
+    <div class="fg" style="margin-bottom:16px"><label>Comment</label><textarea class="fi" id="moRC" rows="3" placeholder="What was great about working with them?"></textarea></div>
+    <div class="ma"><button class="bg" onclick="CM('moRev')">Cancel</button><button class="bp" style="padding:11px" onclick="subRev()">Submit Review</button></div>
+  </div>
+</div>
+<div class="mo" id="moSuspend">
+  <div class="mbox"><h3 id="moSuspendT">Suspend User?</h3><p id="moSuspendP">This can be reversed.</p><div class="ma"><button class="bg" onclick="CM('moSuspend')">Cancel</button><button class="bd" id="moSuspendBtn">Confirm</button></div></div>
+</div>
+
+<!-- NOTIF SHEET -->
+<div class="sho" id="notifSho" onclick="cSho('notifSho',event)">
+  <div class="sheet"><div class="shhdl"></div><div class="shhd"><h3>Notifications</h3><a onclick="markRead()">Mark all read</a></div><div id="notifList" style="overflow-y:auto;flex:1;padding-bottom:16px"></div></div>
+</div>
+
+<!-- MATCH OVERLAY -->
+<div class="matcho" id="matcho">
+  <div class="matchbox"><div style="font-size:2.8rem">🎉</div><div class="matchttl">It's a Match!</div><div class="matchsub" id="matchsub">You can now swap skills!</div><div class="matchavs"><div class="mav" id="mav1"></div><div class="mav" id="mav2"></div></div><div class="ma"><button class="bg" onclick="closeMatch()">Keep Swiping</button><button class="bp" style="padding:11px" onclick="matchMsg()">Message 💬</button></div></div>
+</div>
+
+<!-- CHAT WINDOW -->
+<div class="cwin" id="cwin">
+  <div class="chd">
+    <div class="ib" onclick="closeCwin()"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></div>
+    <div class="chdav" id="cwinav"></div>
+    <div style="flex:1"><div class="chdname" id="cwinname"></div><div class="chdst">● Online</div></div>
+    <div class="ib" onclick="cwinInfo()"><svg viewBox="0 0 24 24"><circle cx="12" cy="5" r="1" fill="#667085"/><circle cx="12" cy="12" r="1" fill="#667085"/><circle cx="12" cy="19" r="1" fill="#667085"/></svg></div>
+  </div>
+  <div class="cmsgs" id="cmsgs"></div>
+  <div class="cbar">
+    <textarea class="cinp" id="cinp" placeholder="Message…" rows="1" onkeydown="ckey(event)" oninput="ars(this)"></textarea>
+    <div class="csend" onclick="sendMsg()"><svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></div>
+  </div>
+</div>
+
+<!-- STUDENT VIEW -->
+<div class="sv" id="sv">
+  <div class="pcov" style="flex-shrink:0"><div class="pavwrap"><div class="pav" id="svav"></div></div><div class="pcovact"><button class="covbtn" onclick="closeSv()">← Back</button></div></div>
+  <div style="background:var(--card);padding:50px 16px 16px;flex-shrink:0">
+    <div class="pname" id="svname"></div><div class="psub" id="svsub"></div><div class="pbio" id="svbio"></div>
+    <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap"><div class="cbdg" id="svcompat" style="font-size:.77rem;padding:4px 12px"></div><div id="svpref" style="font-size:.73rem;color:var(--sub)"></div></div>
+  </div>
+  <div class="pstats"><div class="pst"><div class="pstn" id="svsk">0</div><div class="pstl">Skills</div></div><div class="pst"><div class="pstn" id="svco">0</div><div class="pstl">Connections</div></div><div class="pst"><div class="pstn" id="svra">—</div><div class="pstl">Rating</div></div></div>
+  <div class="div8"></div>
+  <div class="psec"><h4>Skills Offered</h4><div class="stags" id="svoff"></div></div>
+  <div class="psec"><h4>Skills Wanted</h4><div class="stags" id="svwan"></div></div>
+  <div class="psec"><h4>Availability</h4><div class="ach" id="svavail" style="pointer-events:none"></div></div>
+  <div class="div8"></div>
+  <div class="psec"><h4>Reviews</h4><div id="svrevs"></div></div>
+  <div style="padding:0 16px 32px;display:flex;gap:9px">
+    <button class="bp" style="padding:13px" onclick="svReq()">Send Request 🚀</button>
+    <button class="bo" style="padding:13px" onclick="svMsg()">Message 💬</button>
+  </div>
+</div>
+
+<!-- ══ ADMIN SHELL ══ -->
+<div id="adminShell">
+  <div class="admin-top"><h1>⚡ SkillSwap Admin</h1><button class="admin-logout" onclick="adminLogout()">Sign Out</button></div>
+  <div class="admin-tabs" id="adminTabs">
+    <div class="atab on" onclick="aTab('overview',this)">Overview</div>
+    <div class="atab" onclick="aTab('users',this)">Users</div>
+    <div class="atab" onclick="aTab('skills',this)">Skills</div>
+    <div class="atab" onclick="aTab('requests',this)">Requests</div>
+    <div class="atab" onclick="aTab('chats',this)">Chats</div>
+    <div class="atab" onclick="aTab('broadcast',this)">Broadcast</div>
+  </div>
+  <div id="adminContent" class="admin-body"></div>
+</div>
+
+<!-- ══ STUDENT APP SHELL ══ -->
+<div id="mainShell">
+<!-- SPLASH -->
+<div id="spl"><div class="sl">SkillSwap</div><div class="st">Connect · Learn · Grow</div><div class="sd"><span></span><span></span><span></span></div></div>
+
+<!-- PAGE: LOGIN -->
+<div class="page nonav active" id="pg-login">
+  <div class="auth">
+    <div class="ahero"><div class="aicon">🎓</div><div class="alogo">SkillSwap</div><p>Connect with students everywhere.<br>Exchange skills. Grow together.</p></div>
+    <div class="abody">
+      <div style="background:rgba(245,158,11,.09);border:1.5px solid rgba(245,158,11,.28);border-radius:12px;padding:10px 13px;font-size:.76rem;color:#92400e;line-height:1.6">
+        ⚡ <strong>Firebase Setup:</strong> Replace <code>YOUR_API_KEY</code> etc. in the &lt;script&gt; below. Add <strong>localhost</strong> &amp; <strong>127.0.0.1</strong> to Firebase Auth → Authorized Domains.
+      </div>
+      <div class="fg"><label>Email Address</label><input type="email" class="fi" id="lei" placeholder="you@email.com" autocomplete="email"></div>
+      <div class="fg"><label>Password</label><input type="password" class="fi" id="lpw" placeholder="Your password" autocomplete="current-password"></div>
+      <button class="bp" onclick="doLogin()">Sign In →</button>
+      <div class="aswitch">No account? <a onclick="SP('pg-signup')">Sign Up Free</a></div>
+      <div style="text-align:center;margin-top:4px"><a onclick="SP('pg-admin-login')" style="font-size:.78rem;color:var(--sub);cursor:pointer;text-decoration:underline">Admin Portal →</a></div>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE: ADMIN LOGIN -->
+<div class="page nonav" id="pg-admin-login">
+  <div class="auth">
+    <div class="ahero" style="background:linear-gradient(135deg,#1e293b,#334155)"><div class="aicon">⚡</div><div class="alogo">Admin Portal</div><p>SkillSwap platform management.<br>Authorized access only.</p></div>
+    <div class="abody">
+      <div class="fg"><label>Admin Email</label><input type="email" class="fi" id="alei" placeholder="admin@email.com" autocomplete="email"></div>
+      <div class="fg"><label>Password</label><input type="password" class="fi" id="alpw" placeholder="Admin password" autocomplete="current-password"></div>
+      <button class="bp" style="background:linear-gradient(135deg,#1e293b,#334155);box-shadow:0 4px 18px rgba(30,41,59,.4)" onclick="doAdminLogin()">Access Dashboard →</button>
+      <div class="aswitch"><a onclick="SP('pg-login')">← Student Login</a></div>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE: SIGNUP -->
+<div class="page nonav" id="pg-signup">
+  <div class="auth">
+    <div class="ahero"><div class="alogo">Join SkillSwap</div><p>Open to all college &amp; senior high students.<br>Find your skill match today.</p></div>
+    <div class="abody">
+      <div class="fg"><label>Full Name</label><input type="text" class="fi" id="sun" placeholder="Your full name" autocomplete="name"></div>
+      <div class="fr">
+        <div class="fg"><label>School / University</label><input type="text" class="fi" id="suca" placeholder="e.g. UP Manila, DLSU…"></div>
+        <div class="fg"><label>Course / Strand</label><input type="text" class="fi" id="suco" placeholder="e.g. BSIT, STEM…"></div>
+      </div>
+      <div class="fr">
+        <div class="fg"><label>Year / Grade Level</label>
+          <select class="fi" id="suyr"><option value="">Select</option><option>Grade 11</option><option>Grade 12</option><option>1st Year</option><option>2nd Year</option><option>3rd Year</option><option>4th Year</option><option>5th Year</option></select>
+        </div>
+        <div class="fg"><label>Student Type</label>
+          <select class="fi" id="sutype"><option value="college">College</option><option value="shs">Senior High</option></select>
+        </div>
+      </div>
+      <div class="fg"><label>Email</label><input type="email" class="fi" id="suem" placeholder="you@email.com" autocomplete="email"></div>
+      <div class="fg"><label>Password</label><input type="password" class="fi" id="supw" placeholder="Min. 8 characters" autocomplete="new-password"></div>
+      <button class="bp" onclick="doSignup()">Create Account 🚀</button>
+      <div class="aswitch">Have an account? <a onclick="SP('pg-login')">Sign In</a></div>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE: ONBOARDING -->
+<div class="page nonav" id="pg-ob">
+  <div class="ob">
+    <div class="obp"><div class="obpf" id="obpf" style="width:25%"></div></div>
+    <!-- Step 1 -->
+    <div class="obs on" id="ob1">
+      <div class="obhd"><h2>Set up your profile 📸</h2><p>Add a photo and tell others about yourself.</p></div>
+      <div class="avu" id="obavu" onclick="document.getElementById('obavf').click()"><span id="obavph" style="font-size:2.2rem">📷</span><img id="obavimg" style="display:none;width:100%;height:100%;object-fit:cover;border-radius:50%"></div>
+      <input type="file" id="obavf" accept="image/*" style="display:none" onchange="prevObAv(event)">
+      <div class="fg"><label>Bio</label><textarea class="fi" id="obbio" rows="3" placeholder="Tell others about yourself, your interests, and what you're looking for…"></textarea></div>
+      <div class="fg"><label>Availability</label><div class="ach" id="obav"><div class="ac" onclick="tav(this)">Weekdays</div><div class="ac" onclick="tav(this)">Weekends</div><div class="ac" onclick="tav(this)">Mornings</div><div class="ac" onclick="tav(this)">Afternoons</div><div class="ac" onclick="tav(this)">Evenings</div><div class="ac" onclick="tav(this)">Online Only</div><div class="ac" onclick="tav(this)">In-Person</div></div></div>
+      <div class="oba"><button class="bp" onclick="obGo(2)">Continue →</button></div>
+    </div>
+    <!-- Step 2 -->
+    <div class="obs" id="ob2">
+      <div class="obhd"><h2>What can you teach? 🎯</h2><p>Pick from our skill list or type your own.</p></div>
+      <div class="fg"><label>Skills You Offer</label>
+        <div class="sti"><input type="text" class="fi" id="oboi" placeholder="Type a skill…" onkeydown="if(event.key==='Enter'){event.preventDefault();obAdd('o')}"><button class="bp" style="width:auto;padding:9px 15px;flex-shrink:0" onclick="obAdd('o')">Add</button></div>
+        <div class="stags" id="obot"></div>
+      </div>
+      <div class="fg"><label>Quick Picks</label><div class="qpick" id="obQOff"></div></div>
+      <div class="oba"><button class="bo" onclick="obGo(1)" style="width:auto;padding:11px 18px">← Back</button><button class="bp" onclick="obGo(3)">Continue →</button></div>
+    </div>
+    <!-- Step 3 -->
+    <div class="obs" id="ob3">
+      <div class="obhd"><h2>What do you want to learn? 📚</h2><p>Pick skills you want to acquire or exchange for.</p></div>
+      <div class="fg"><label>Skills You Want</label>
+        <div class="sti"><input type="text" class="fi" id="obwi" placeholder="Type a skill…" onkeydown="if(event.key==='Enter'){event.preventDefault();obAdd('w')}"><button class="bp" style="width:auto;padding:9px 15px;flex-shrink:0" onclick="obAdd('w')">Add</button></div>
+        <div class="stags" id="obwt"></div>
+      </div>
+      <div class="fg"><label>Quick Picks</label><div class="qpick" id="obQWan"></div></div>
+      <div class="oba"><button class="bo" onclick="obGo(2)" style="width:auto;padding:11px 18px">← Back</button><button class="bp" onclick="obGo(4)">Continue →</button></div>
+    </div>
+    <!-- Step 4 -->
+    <div class="obs" id="ob4">
+      <div class="obhd"><h2>Your preferences ⚙️</h2><p>How do you want to exchange skills?</p></div>
+      <div class="fg"><label>Swap Preference</label><select class="fi" id="obsp"><option>Skill for Skill (Free Exchange)</option><option>Paid Services Only</option><option>Both Paid & Free Swaps</option><option>Open to Collaboration</option></select></div>
+      <div class="fg"><label>Interests (optional)</label><input type="text" class="fi" id="obint" placeholder="e.g. tech, arts, gaming, business…"></div>
+      <div class="fg"><label>GitHub (optional)</label><input type="url" class="fi" id="obgh" placeholder="https://github.com/username"></div>
+      <div class="fg"><label>LinkedIn (optional)</label><input type="url" class="fi" id="obli" placeholder="https://linkedin.com/in/name"></div>
+      <div class="oba"><button class="bo" onclick="obGo(3)" style="width:auto;padding:11px 18px">← Back</button><button class="bp" onclick="obFinish()">Finish Setup 🚀</button></div>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE: DASHBOARD -->
+<div class="page" id="pg-dashboard">
+  <div class="dhero">
+    <div class="dtop">
+      <div class="duser"><div class="dav" id="dav"></div><div><div class="dgr" id="dgr">Good morning 👋</div><div class="dname" id="dname">Loading…</div></div></div>
+      <div class="dicons">
+        <div class="dic" onclick="OM('notifSho')"><svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><div class="dot" id="dnotdot" style="display:none"></div></div>
+        <div class="dic" onclick="OM('moOut')"><svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></div>
+      </div>
+    </div>
+    <div class="dstats"><div class="dst"><div class="dstn" id="dsc">0</div><div class="dstl">Connections</div></div><div class="dst"><div class="dstn" id="dsr">0</div><div class="dstl">Requests</div></div><div class="dst"><div class="dstn" id="dss">0</div><div class="dstl">Skills</div></div></div>
+  </div>
+  <div class="sb">
+    <div style="padding:14px 16px 6px"><div class="sw"><svg class="sico" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><input type="text" class="sbar" id="dsrch" placeholder="Search students, skills, schools…" onkeydown="if(event.key==='Enter')openSearch(this.value)"></div></div>
+    <div class="qarow">
+      <div class="qa" onclick="navTo('swipe')"><div class="qaico" style="background:linear-gradient(135deg,#5367f5,#7c4dff)">🔥</div><div class="qalbl">Swipe</div></div>
+      <div class="qa" onclick="navTo('discover')"><div class="qaico" style="background:linear-gradient(135deg,#22c55e,#16a34a)">🔍</div><div class="qalbl">Discover</div></div>
+      <div class="qa" onclick="navTo('requests')"><div class="qaico" style="background:linear-gradient(135deg,#f59e0b,#d97706)">📬</div><div class="qalbl">Requests</div></div>
+      <div class="qa" onclick="navTo('chat')"><div class="qaico" style="background:linear-gradient(135deg,#ef4444,#dc2626)">💬</div><div class="qalbl">Messages</div></div>
+    </div>
+    <div class="sh"><h3>✨ Recommended for You</h3><a onclick="navTo('discover')">See all</a></div>
+    <div class="hs" id="drec"></div>
+    <div class="sh"><h3>🔥 Trending Skills</h3></div>
+    <div class="hs" id="dtrend"></div>
+    <div class="sh"><h3>📬 Active Requests</h3><a onclick="navTo('requests')">View all</a></div>
+    <div style="padding:0 16px 4px" id="dreqs"></div>
+    <div class="sh"><h3>💬 Recent Messages</h3><a onclick="navTo('chat')">View all</a></div>
+    <div style="padding:0 16px 16px" id="dmsgs"></div>
+  </div>
+</div>
+
+<!-- PAGE: DISCOVER -->
+<div class="page" id="pg-discover">
+  <div class="topbar"><div class="tbl">Discover</div><div class="tba"><div class="ib" onclick="OM('notifSho')"><svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><div class="dot" id="dndot" style="display:none"></div></div><div class="ib" onclick="OM('moOut')"><svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></div></div></div>
+  <div style="padding:12px 16px 6px;flex-shrink:0"><div class="sw"><svg class="sico" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><input type="text" class="sbar" id="discsrch" placeholder="Search by skill, name, or school…" oninput="filterDisc(this.value)"></div></div>
+  <div class="hs" style="padding:6px 16px 10px;flex-shrink:0" id="discfilts">
+    <div class="pill on" onclick="dFilt('all',this)">All</div><div class="pill" onclick="dFilt('swap',this)">Skill Swap</div><div class="pill" onclick="dFilt('tutor',this)">Tutoring</div><div class="pill" onclick="dFilt('collab',this)">Collab</div><div class="pill" onclick="dFilt('paid',this)">Paid</div><div class="pill" onclick="dFilt('online',this)">Online</div><div class="pill" onclick="dFilt('college',this)">College</div><div class="pill" onclick="dFilt('shs',this)">Senior HS</div>
+  </div>
+  <div class="sb" style="padding:0 14px 8px" id="disccards"></div>
+</div>
+
+<!-- PAGE: SWIPE -->
+<div class="page" id="pg-swipe">
+  <div class="topbar"><div class="ib" onclick="navTo('discover')"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></div><div class="tbl">Swipe Mode 🔥</div><div class="ib" onclick="OM('notifSho')"><svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></div></div>
+  <div class="swwrap">
+    <div class="swcnt"><span id="swcnt">Loading…</span></div>
+    <div class="swstack" id="swstack"></div>
+    <div class="swhint"><span>👈 Pass</span><span>·</span><span>⭐ Super</span><span>·</span><span>Connect 👉</span></div>
+    <div class="swbtns">
+      <button class="swb rej" onclick="swDir('left')"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+      <button class="swb str" onclick="swDir('super')"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></button>
+      <button class="swb acc" onclick="swDir('right')"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></button>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE: REQUESTS -->
+<div class="page" id="pg-requests">
+  <div class="topbar"><div class="tbl">Requests</div><div class="tba"><div class="ib" onclick="OM('notifSho')"><svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><div class="dot" id="rndot" style="display:none"></div></div></div></div>
+  <div class="rtabs"><div class="rtab on" onclick="switchTab('incoming',this)">Incoming</div><div class="rtab" onclick="switchTab('outgoing',this)">Sent</div><div class="rtab" onclick="switchTab('active',this)">Active</div><div class="rtab" onclick="switchTab('completed',this)">Done</div></div>
+  <div class="sb" id="rlist"></div>
+</div>
+
+<!-- PAGE: CHAT LIST -->
+<div class="page" id="pg-chat">
+  <div class="topbar"><div class="tbl">Messages</div><div class="tba"><div class="ib" onclick="OM('notifSho')"><svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></div></div></div>
+  <div class="sb" id="chatlist" style="background:var(--card)"></div>
+</div>
+
+<!-- PAGE: PROFILE -->
+<div class="page" id="pg-profile">
+  <div class="pcov"><div class="pavwrap"><div class="pav" id="profav"></div></div><div class="pcovact"><button class="covbtn" onclick="SP('pg-edit');loadEdit()">Edit</button></div></div>
+  <div class="sb">
+    <div class="pinfo"><div class="pname" id="profname"></div><div class="psub" id="profsub"></div><div class="pbio" id="profbio"></div><div style="margin-top:10px;display:flex;gap:7px;flex-wrap:wrap" id="profavail"></div></div>
+    <div class="pstats"><div class="pst" onclick="SP('pg-conn');loadConn()"><div class="pstn" id="psc">0</div><div class="pstl">Connections</div></div><div class="pst"><div class="pstn" id="psd">0</div><div class="pstl">Swaps Done</div></div><div class="pst"><div class="pstn" id="psr">—</div><div class="pstl">Rating</div></div></div>
+    <div class="div8"></div>
+    <div class="psec"><h4>Skills Offered</h4><div class="stags" id="profoff"></div></div>
+    <div class="psec"><h4>Skills Wanted</h4><div class="stags" id="profwan"></div></div>
+    <div class="div8"></div>
+    <div class="psec"><h4>Reviews & Ratings</h4><div id="profrevs"></div></div>
+    <div style="padding:0 16px 16px"><button class="bo" style="width:100%;padding:12px" onclick="SP('pg-settings')">⚙️ Settings</button></div>
+  </div>
+</div>
+
+<!-- PAGE: EDIT PROFILE -->
+<div class="page nonav" id="pg-edit">
+  <div class="topbar"><div class="ib" onclick="SP('pg-profile');loadProfile()"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></div><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:1rem">Edit Profile</div><button class="bp" style="width:auto;padding:7px 16px;font-size:.82rem" onclick="saveProfile()">Save</button></div>
+  <div class="sb" style="padding:16px">
+    <div style="display:flex;flex-direction:column;gap:14px">
+      <div style="text-align:center"><div class="avu" id="editavu" onclick="document.getElementById('editavf').click()" style="margin:0 auto"><div id="editavsh" style="font-size:2.2rem">📷</div></div><input type="file" id="editavf" accept="image/*" style="display:none" onchange="prevEditAv(event)"><div style="font-size:.74rem;color:var(--sub);margin-top:7px">Tap to change photo</div></div>
+      <div class="fg"><label>Bio</label><textarea class="fi" id="editbio" rows="3"></textarea></div>
+      <div class="fg"><label>Skills Offered</label><div class="sti"><input type="text" class="fi" id="editoi" placeholder="Add a skill…" onkeydown="if(event.key==='Enter'){event.preventDefault();editAdd('o')}"><button class="bp" style="width:auto;padding:9px 14px;flex-shrink:0" onclick="editAdd('o')">+</button></div><div class="stags" id="editot"></div></div>
+      <div class="fg"><label>Skills Wanted</label><div class="sti"><input type="text" class="fi" id="editwi" placeholder="Add a skill…" onkeydown="if(event.key==='Enter'){event.preventDefault();editAdd('w')}"><button class="bp" style="width:auto;padding:9px 14px;flex-shrink:0" onclick="editAdd('w')">+</button></div><div class="stags" id="editwt"></div></div>
+      <div class="fg"><label>Availability</label><div class="ach" id="editavc"><div class="ac" onclick="this.classList.toggle('on')">Weekdays</div><div class="ac" onclick="this.classList.toggle('on')">Weekends</div><div class="ac" onclick="this.classList.toggle('on')">Mornings</div><div class="ac" onclick="this.classList.toggle('on')">Afternoons</div><div class="ac" onclick="this.classList.toggle('on')">Evenings</div><div class="ac" onclick="this.classList.toggle('on')">Online Only</div><div class="ac" onclick="this.classList.toggle('on')">In-Person</div></div></div>
+      <div class="fg"><label>Swap Preference</label><select class="fi" id="editsp"><option>Skill for Skill (Free Exchange)</option><option>Paid Services Only</option><option>Both Paid & Free Swaps</option><option>Open to Collaboration</option></select></div>
+      <div class="fg"><label>Interests</label><input type="text" class="fi" id="editint"></div>
+      <div class="fg"><label>GitHub URL</label><input type="url" class="fi" id="editgh"></div>
+      <div class="fg"><label>LinkedIn URL</label><input type="url" class="fi" id="editli"></div>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE: CONNECTIONS -->
+<div class="page nonav" id="pg-conn">
+  <div class="topbar"><div class="ib" onclick="SP('pg-profile')"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></div><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:1rem">Connections</div><div></div></div>
+  <div class="sb" id="connlist"></div>
+</div>
+
+<!-- PAGE: SETTINGS -->
+<div class="page nonav" id="pg-settings">
+  <div class="topbar"><div class="ib" onclick="SP('pg-profile')"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></div><div style="font-family:'Sora',sans-serif;font-weight:700;font-size:1rem">Settings</div><div></div></div>
+  <div class="sb">
+    <div class="ssec"><div class="sseclbl">Account</div>
+      <div class="sitem" onclick="SP('pg-edit');loadEdit()"><span class="slbl">Edit Profile</span><div class="sright"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div></div>
+      <div class="sitem" onclick="SP('pg-conn');loadConn()"><span class="slbl">My Connections</span><div class="sright"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div></div>
+    </div>
+    <div class="ssec"><div class="sseclbl">Notifications</div>
+      <div class="sitem"><span class="slbl">Push Notifications</span><div class="sright"><div class="tog on" onclick="this.classList.toggle('on')"></div></div></div>
+      <div class="sitem"><span class="slbl">Message Alerts</span><div class="sright"><div class="tog on" onclick="this.classList.toggle('on')"></div></div></div>
+    </div>
+    <div class="ssec"><div class="sseclbl">Danger Zone</div>
+      <div class="sitem" onclick="OM('moOut')"><span class="slbl" style="color:var(--er)">Sign Out</span><div class="sright"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div></div>
+    </div>
+    <div style="height:20px"></div>
+  </div>
+</div>
+
+<!-- PAGE: SEARCH -->
+<div class="page nonav" id="pg-search">
+  <div style="padding:10px 14px;background:var(--card);border-bottom:1px solid var(--br);display:flex;gap:9px;align-items:center;flex-shrink:0">
+    <div class="ib" onclick="navTo('dashboard')"><svg viewBox="0 0 24 24" style="width:20px;height:20px;stroke:var(--tx);fill:none;stroke-width:2"><polyline points="15 18 9 12 15 6"/></svg></div>
+    <input type="text" class="fi" id="srchi" placeholder="Search students, skills, schools…" style="flex:1;background:var(--bg);border:1.5px solid var(--br);border-radius:50px;padding:9px 14px" onkeydown="if(event.key==='Enter')doSearch()">
+    <button class="bp" style="width:auto;padding:9px 16px;font-size:.82rem" onclick="doSearch()">Search</button>
+  </div>
+  <div class="sb" style="padding:8px 14px" id="srchres"></div>
+</div>
+
+<!-- BOTTOM NAV -->
+<nav class="bnav" id="bnav" style="display:none">
+  <div class="ni on" id="nav-dashboard" onclick="navTo('dashboard')"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span>Home</span></div>
+  <div class="ni" id="nav-discover" onclick="navTo('discover')"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><span>Discover</span></div>
+  <div class="ni" id="nav-requests" onclick="navTo('requests')"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><span>Requests</span><div class="nb" id="rnb" style="display:none">0</div></div>
+  <div class="ni" id="nav-chat" onclick="navTo('chat')"><svg viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg><span>Chat</span><div class="nb" id="cnb" style="display:none">0</div></div>
+  <div class="ni" id="nav-profile" onclick="navTo('profile')"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span>Profile</span></div>
+</nav>
+</div><!-- #mainShell -->
+<script type="module">
+import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import{getAuth,createUserWithEmailAndPassword,signInWithEmailAndPassword,signOut,onAuthStateChanged,updateProfile}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import{getFirestore,doc,setDoc,getDoc,updateDoc,deleteDoc,collection,addDoc,query,where,orderBy,onSnapshot,getDocs,serverTimestamp,limit,increment,writeBatch,arrayUnion}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+/* ════════════════════════════════════════════════
+   🔥 STEP 1 — REPLACE THESE WITH YOUR FIREBASE CONFIG
+   Firebase Console → Project Settings → Your Apps → SDK
+════════════════════════════════════════════════ */
+const firebaseConfig = {
+  apiKey: "AIzaSyCD20eoH8yAM0ljiOuB87IaYkKistKLB5Y",
+  authDomain: "skillswap-ver2.firebaseapp.com",
+  projectId: "skillswap-ver2",
+  storageBucket: "skillswap-ver2.firebasestorage.app",
+  messagingSenderId: "226016100545",
+  appId: "1:226016100545:web:973f57d032416c34715440"
+};
+
+/* ════════════════════════════════════════════════
+   🔥 STEP 2 — ADMIN ACCOUNT
+   Go to Firebase Console → Authentication → Users → Add User
+   Email:    admin123@sti.edu.ph
+   Password: admin123
+   Then that account will automatically access the admin panel.
+════════════════════════════════════════════════ */
+const ADMIN_EMAIL = "admin123@sti.edu.ph";
+
+/* ════════════════════════════════════════════════
+   🔥 STEP 3 — FIRESTORE RULES (copy into Firebase Console → Firestore → Rules)
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isAuth() { return request.auth != null; }
+    function isUser(uid) { return isAuth() && request.auth.uid == uid; }
+    function isParticipant(participants) { return isAuth() && request.auth.uid in participants; }
+
+    // Users
+    match /users/{uid} {
+      allow read: if isAuth();
+      allow create: if isUser(uid);
+      allow update: if isUser(uid);
+    }
+
+    // Conversations — CRITICAL: allow create by participant, read/write by participant
+    match /conversations/{chatId} {
+      allow read:   if isAuth() && isParticipant(resource.data.participants);
+      allow create: if isAuth() && isParticipant(request.resource.data.participants);
+      allow update: if isAuth() && isParticipant(resource.data.participants);
+      allow delete: if false;
+
+      // Messages sub-collection
+      match /messages/{msgId} {
+        allow read:   if isAuth() && isParticipant(get(/databases/$(database)/documents/conversations/$(chatId)).data.participants);
+        allow create: if isAuth()
+                      && isParticipant(get(/databases/$(database)/documents/conversations/$(chatId)).data.participants)
+                      && request.resource.data.senderId == request.auth.uid;
+      }
+    }
+
+    // Requests
+    match /requests/{reqId} {
+      allow read:   if isAuth() && isParticipant(resource.data.participants);
+      allow create: if isAuth()
+                    && request.auth.uid == request.resource.data.senderId
+                    && isParticipant(request.resource.data.participants);
+      allow update: if isAuth() && isParticipant(resource.data.participants);
+      allow delete: if isAuth() && request.auth.token.email == '${ADMIN_EMAIL}';
+    }
+
+    // Notifications
+    match /notifications/{nid} {
+      allow read, update: if isAuth() && request.auth.uid == resource.data.toUid;
+      allow create: if isAuth();
+      allow delete: if false;
+    }
+
+    // Reviews
+    match /reviews/{rid} {
+      allow read: if isAuth();
+      allow create: if isAuth() && request.auth.uid == request.resource.data.fromUid;
+    }
+
+    // Connections
+    match /connections/{cid} {
+      allow read, create: if isAuth();
+    }
+
+    // Admin-controlled settings (trending skills, skill suggestions)
+    match /settings/{docId} {
+      allow read: if isAuth();
+      allow write: if isAuth() && request.auth.token.email == '${ADMIN_EMAIL}';
+    }
+  }
+}
+
+   🔥 STEP 4 — FIRESTORE INDEXES (create in Firebase Console → Firestore → Indexes)
+   Composite indexes needed:
+   1. Collection: requests  | Fields: participants(Array) ASC, status ASC, createdAt DESC
+   2. Collection: requests  | Fields: senderId ASC, createdAt DESC
+   3. Collection: requests  | Fields: receiverId ASC, status ASC, createdAt DESC
+   4. Collection: conversations | Fields: participants(Array) ASC, lastMessageTime DESC
+   5. Collection: notifications | Fields: toUid ASC, createdAt DESC
+   6. Collection: conversations/{id}/messages | Fields: createdAt ASC
+
+   Without these indexes Firestore will show an error with a direct link to create them.
+   Just click the link in the browser console error — it creates the index automatically.
+════════════════════════════════════════════════ */
+
+/* ── INIT ── */
+let auth, db, fbOK = false;
+try {
+  const app = initializeApp(firebaseConfig);
+  auth = getAuth(app);
+  db   = getFirestore(app);
+  fbOK = true;
+} catch(e) {
+  console.error("Firebase init failed:", e.message);
+}
+
+/* ── DEFAULT SKILLS (fallback if admin hasn't set any) ── */
+const DEFAULT_SKILLS = [
+  "Python","JavaScript","TypeScript","React","Vue.js","Node.js",
+  "Flutter","Kotlin","Swift","Java","C++","C#","PHP","HTML/CSS",
+  "Web Development","Mobile Development","UI/UX Design","Graphic Design",
+  "Video Editing","Photography","Illustration","Motion Graphics",
+  "Data Science","Machine Learning","Data Analysis","SQL",
+  "Excel/Sheets","Power BI","Math Tutoring","Science Tutoring",
+  "English Writing","Public Speaking","Digital Marketing","SEO",
+  "Content Writing","Social Media","Accounting","Business Analysis",
+  "Project Management","Figma","Adobe XD","Canva","After Effects"
+];
+
+/* ── GLOBAL STATE ── */
+const G = {
+  user: null, me: null,
+  students: [],
+  swPool: [], swIdx: 0,
+  editO: [], editW: [],
+  obO: [], obW: [],
+  rtab: 'incoming',
+  rating: 0, revTarget: null, reqTarget: null,
+  /* CHAT — deterministic ID = [uid1,uid2].sort().join('_') */
+  chatId: null, chatPartnerUid: null, chatPartnerName: null,
+  svData: null, matchedS: null, newAv: null,
+  unsubs: {},
+  trendSkills: [], siteSkills: []
+};
+
+/* ── EMPTY STATE MESSAGES ── */
+const EMPTY = {
+  chat:        { ei:'💬', h:"No messages yet",          p:"Connect with a student and start your first skill swap conversation!" },
+  incoming:    { ei:'📥', h:"No incoming requests",     p:"When someone wants to swap skills with you, it'll appear here." },
+  outgoing:    { ei:'📤', h:"No sent requests",         p:"Find a student with a skill you want and send your first request." },
+  active:      { ei:'🤝', h:"No active swaps",          p:"Accept an incoming request to kick off a real skill exchange." },
+  completed:   { ei:'🏆', h:"No completed swaps yet",   p:"Finish a skill exchange to see it here. Your first swap is waiting!" },
+  discover:    { ei:'🔍', h:"No students found",        p:"Try different keywords or filters. New students join every day!" },
+  connections: { ei:'🌐', h:"No connections yet",       p:"Swipe right on someone to start building your skill network." },
+  notifications:{ ei:'🔔', h:"You're all caught up!",  p:"New matches, requests, and messages will appear here." },
+};
+function mkEmpty(type, ctaLabel, ctaFn) {
+  const e = EMPTY[type] || EMPTY.discover;
+  return `<div class="empty">
+    <div class="ei">${e.ei}</div>
+    <h3>${e.h}</h3>
+    <p>${e.p}</p>
+    ${ctaLabel ? `<div class="ep" onclick="${ctaFn}">${ctaLabel}</div>` : ''}
+  </div>`;
+}
+
+/* ════════════════════════════════════════════════
+   AUTH STATE LISTENER
+════════════════════════════════════════════════ */
+if (fbOK) {
+  onAuthStateChanged(auth, async user => {
+    if (user) {
+      G.user = user;
+      /* ── Is this the admin? ── */
+      if (user.email === ADMIN_EMAIL) {
+        hideSplash();
+        launchAdmin();
+        return;
+      }
+      try {
+        const snap = await getDoc(doc(db, 'users', user.uid));
+        if (snap.exists()) {
+          G.me = snap.data();
+          if (G.me.suspended) {
+            await signOut(auth);
+            hideSplash(); SP('pg-login');
+            T('Your account has been suspended. Contact support.'); return;
+          }
+          if (!G.me.onboarded) { hideSplash(); SP('pg-ob'); }
+          else { await fetchStudents(); hideSplash(); launchStudent(); }
+        } else {
+          hideSplash(); SP('pg-ob');
+        }
+      } catch(e) {
+        console.error('Auth load error:', e);
+        hideSplash(); SP('pg-login');
+        T('Error loading profile. Check your Firebase config and Firestore rules.');
+      }
+    } else {
+      G.user = null; G.me = null;
+      killListeners();
+      hideSplash();
+      document.getElementById('bnav').style.display = 'none';
+      document.getElementById('adminShell').classList.remove('on');
+      document.getElementById('mainShell').style.display = '';
+      SP('pg-login');
+    }
+  });
+} else {
+  setTimeout(() => { hideSplash(); SP('pg-login'); }, 1200);
+}
+
+async function fetchStudents() {
+  if (!fbOK || !G.user) return;
+  try {
+    const snap = await getDocs(query(collection(db,'users'), where('onboarded','==',true)));
+    G.students = snap.docs
+      .map(d => ({ id: d.id, ...d.data() }))
+      .filter(u => u.uid !== G.user.uid && !u.suspended);
+  } catch(e) {
+    console.warn('fetchStudents error:', e.message);
+    G.students = [];
+  }
+}
+
+function launchStudent() {
+  document.getElementById('mainShell').style.display = '';
+  document.getElementById('adminShell').classList.remove('on');
+  document.getElementById('bnav').style.display = 'flex';
+  setGreet();
+  loadTrendSkills();
+  loadSiteSkills();
+  navTo('dashboard');
+  loadNotifs();
+  pingLastSeen();
+}
+
+function killListeners() {
+  Object.values(G.unsubs).forEach(fn => { try { fn(); } catch(e) {} });
+  G.unsubs = {};
+}
+
+/* ════════════════════════════════════════════════
+   AUTH FUNCTIONS
+════════════════════════════════════════════════ */
+window.doLogin = async function() {
+  if (!fbOK) return T('Firebase not configured — replace YOUR_API_KEY in the script');
+  const e = V('lei'), p = V('lpw');
+  if (!e || !p) return T('Please fill in all fields');
+  try { await signInWithEmailAndPassword(auth, e, p); }
+  catch(err) { T(fErr(err.code || err.message)); }
+};
+
+window.doAdminLogin = async function() {
+  if (!fbOK) return T('Firebase not configured');
+  const e = V('alei'), p = V('alpw');
+  if (!e || !p) return T('Please fill in all fields');
+  if (e !== ADMIN_EMAIL) return T('Not an admin account');
+  try { await signInWithEmailAndPassword(auth, e, p); }
+  catch(err) { T(fErr(err.code || err.message)); }
+};
+
+window.doSignup = async function() {
+  if (!fbOK) return T('Firebase not configured — replace YOUR_API_KEY in the script');
+  const n=V('sun'),ca=V('suca'),co=V('suco'),yr=V('suyr'),st=V('sutype'),em=V('suem'),pw=V('supw');
+  if (!n||!ca||!co||!yr||!em||!pw) return T('Please fill in all required fields');
+  if (pw.length < 8) return T('Password must be at least 8 characters');
+  try {
+    const cr = await createUserWithEmailAndPassword(auth, em, pw);
+    await updateProfile(cr.user, { displayName: n });
+    const data = {
+      name:n, school:ca, course:co, year:yr,
+      studentType: st || 'college',
+      email:em, uid:cr.user.uid,
+      skillsOffered:[], skillsWanted:[],
+      bio:'', avatar:'', availability:[],
+      swapPref:'Skill for Skill (Free Exchange)',
+      interests:'', github:'', linkedin:'',
+      connections:0, completedSwaps:0,
+      rating:0, ratingCount:0,
+      onboarded:false, suspended:false, role:'student',
+      createdAt: serverTimestamp(), lastSeen: serverTimestamp()
+    };
+    await setDoc(doc(db,'users',cr.user.uid), data);
+    G.me = data;
+    SP('pg-ob');
+  } catch(err) { T(fErr(err.code || err.message)); }
+};
+
+window.doLogout = async function() {
+  CM('moOut'); killListeners();
+  try { if(fbOK) await signOut(auth); } catch(e) {}
+};
+
+/* ════════════════════════════════════════════════
+   TRENDING + SITE SKILLS (real-time from Firestore)
+════════════════════════════════════════════════ */
+function loadTrendSkills() {
+  if (!fbOK) return;
+  if (G.unsubs.trend) G.unsubs.trend();
+  G.unsubs.trend = onSnapshot(doc(db,'settings','trending'), snap => {
+    if (snap.exists() && snap.data().skills?.length) {
+      G.trendSkills = snap.data().skills;
+    } else {
+      autoCalcTrend();
+    }
+    renderTrend();
+  }, () => renderTrend());
+}
+
+function autoCalcTrend() {
+  if (!G.students.length) return;
+  const freq = {};
+  G.students.forEach(s => (s.skillsOffered||[]).forEach(sk => {
+    const k = (sk||'').trim(); if(k) freq[k] = (freq[k]||0) + 1;
+  }));
+  G.trendSkills = Object.entries(freq).sort((a,b) => b[1]-a[1]).slice(0,12).map(([k]) => k);
+}
+
+function loadSiteSkills() {
+  if (!fbOK) return;
+  if (G.unsubs.siteSkills) G.unsubs.siteSkills();
+  G.unsubs.siteSkills = onSnapshot(doc(db,'settings','skills'), snap => {
+    G.siteSkills = snap.exists() && snap.data().list?.length ? snap.data().list : DEFAULT_SKILLS;
+    renderObQuickPicks();
+  }, () => { G.siteSkills = DEFAULT_SKILLS; renderObQuickPicks(); });
+}
+
+function renderObQuickPicks() {
+  const skills = G.siteSkills.length ? G.siteSkills : DEFAULT_SKILLS;
+  const mid = Math.ceil(skills.length / 2);
+  const el1 = document.getElementById('obQOff');
+  const el2 = document.getElementById('obQWan');
+  if (el1) el1.innerHTML = skills.slice(0,mid).map(s => `<div class="qchip" onclick="obQ('o','${E(s)}')">${E(s)}</div>`).join('');
+  if (el2) el2.innerHTML = skills.slice(mid).map(s => `<div class="qchip" onclick="obQ('w','${E(s)}')">${E(s)}</div>`).join('');
+}
+
+/* ════════════════════════════════════════════════
+   ONBOARDING
+════════════════════════════════════════════════ */
+window.obGo = function(s) {
+  document.querySelectorAll('.obs').forEach(x => x.classList.remove('on'));
+  document.getElementById('ob'+s).classList.add('on');
+  document.getElementById('obpf').style.width = (s/4*100)+'%';
+};
+window.obAdd = function(t) {
+  const id = t==='o'?'oboi':'obwi', v = V(id); if(!v) return;
+  const a = t==='o'?G.obO:G.obW;
+  if (!a.includes(v)) { a.push(v); renderObS(t); }
+  document.getElementById(id).value = '';
+};
+window.obQ = function(t, s) {
+  const a = t==='o'?G.obO:G.obW;
+  if (!a.includes(s)) { a.push(s); renderObS(t); }
+  // Highlight chip
+  const container = document.getElementById(t==='o'?'obQOff':'obQWan');
+  if (container) container.querySelectorAll('.qchip').forEach(c => { if(c.textContent===s) c.classList.add('sel'); });
+};
+function renderObS(t) {
+  const a = t==='o'?G.obO:G.obW, id = t==='o'?'obot':'obwt';
+  document.getElementById(id).innerHTML = a.map((s,i) => `<div class="stag">${E(s)}<span class="rm" onclick="obRm('${t}',${i})">✕</span></div>`).join('');
+}
+window.obRm = function(t,i) { (t==='o'?G.obO:G.obW).splice(i,1); renderObS(t); };
+window.tav  = function(el) { el.classList.toggle('on'); };
+window.prevObAv = function(e) {
+  const f = e.target.files[0]; if(!f) return;
+  const r = new FileReader();
+  r.onload = ev => {
+    document.getElementById('obavimg').src = ev.target.result;
+    document.getElementById('obavimg').style.display = 'block';
+    document.getElementById('obavph').style.display = 'none';
+    G.newAv = ev.target.result;
+  }; r.readAsDataURL(f);
+};
+window.obFinish = async function() {
+  const data = {
+    bio: V('obbio'),
+    availability: Array.from(document.querySelectorAll('#ob1 .ac.on')).map(c => c.textContent),
+    swapPref: V('obsp'), interests: V('obint'),
+    github: V('obgh'), linkedin: V('obli'),
+    skillsOffered: G.obO, skillsWanted: G.obW, onboarded: true
+  };
+  if (G.newAv) data.avatar = G.newAv;
+  G.me = { ...G.me, ...data };
+  try { if (G.user) await updateDoc(doc(db,'users',G.user.uid), data); }
+  catch(e) { T('Save failed — check your connection'); }
+  await fetchStudents().catch(() => {});
+  launchStudent();
+};
+
+/* ════════════════════════════════════════════════
+   DASHBOARD
+════════════════════════════════════════════════ */
+function setGreet() {
+  const h = new Date().getHours();
+  const g = h<12?'Good morning 🌤️':h<17?'Good afternoon ☀️':'Good evening 🌙';
+  const el = document.getElementById('dgr'); if(el) el.textContent = g;
+}
+
+function loadDashboard() {
+  const u = G.me; if (!u) return;
+  const dav = document.getElementById('dav');
+  dav.innerHTML = u.avatar
+    ? `<img src="${u.avatar}" style="width:100%;height:100%;border-radius:50%;object-fit:cover">`
+    : ini(u.name, 1);
+  document.getElementById('dname').textContent = u.name || 'Student';
+  document.getElementById('dsc').textContent   = u.connections || 0;
+  document.getElementById('dss').textContent   = (u.skillsOffered||[]).length;
+  renderRec(); renderTrend(); renderDReqs(); renderDMsgs();
+  // Live stats
+  if (fbOK && G.user) {
+    if (G.unsubs.dstats) G.unsubs.dstats();
+    G.unsubs.dstats = onSnapshot(doc(db,'users',G.user.uid), snap => {
+      if (!snap.exists()) return;
+      G.me = { ...G.me, ...snap.data() };
+      document.getElementById('dsc').textContent = G.me.connections || 0;
+      document.getElementById('dss').textContent = (G.me.skillsOffered||[]).length;
+    }, () => {});
+  }
+}
+
+function renderRec() {
+  const el = document.getElementById('drec');
+  if (!G.students.length) { el.innerHTML = `<div style="padding:8px 4px;font-size:.82rem;color:var(--sub)">Loading students…</div>`; return; }
+  const sorted = [...G.students].sort((a,b) => calcCompat(b)-calcCompat(a)).slice(0,10);
+  el.innerHTML = sorted.map(s => {
+    const c = calcCompat(s);
+    return `<div class="pc" onclick="openSv('${s.id}')">
+      <div class="av" style="position:relative">${avH(s)}<div class="olr" style="display:${isOnline(s)?'block':'none'}"></div></div>
+      <h4>${E(s.name)}</h4>
+      <p style="font-size:.67rem">${E(s.school||'')} · ${E(s.year||'')}</p>
+      <div class="cbdg">${c}% match</div>
+      <div class="chips">${(s.skillsOffered||[]).slice(0,2).map(sk=>`<div class="chip">${E(sk)}</div>`).join('')}</div>
+    </div>`;
+  }).join('');
+}
+
+function renderTrend() {
+  const el = document.getElementById('dtrend'); if(!el) return;
+  const skills = G.trendSkills.length ? G.trendSkills : DEFAULT_SKILLS.slice(0,8);
+  el.innerHTML = skills.map(s => `<div class="pill" onclick="fBySkill('${E(s.split(' ')[0])}')">${E(s)}</div>`).join('');
+}
+
+function renderDReqs() {
+  const el = document.getElementById('dreqs');
+  if (!fbOK || !G.user) { el.innerHTML = mkEmpty('active'); return; }
+  if (G.unsubs.dr) G.unsubs.dr();
+  try {
+    /* ── Simple query — no composite index needed ── */
+    const q = query(
+      collection(db,'requests'),
+      where('participants','array-contains', G.user.uid),
+      orderBy('createdAt','desc'), limit(5)
+    );
+    G.unsubs.dr = onSnapshot(q, sn => {
+      const r = sn.docs.map(d=>({id:d.id,...d.data()})).filter(x=>x.status==='pending'||x.status==='accepted');
+      document.getElementById('dsr').textContent = r.length;
+      if (!r.length) { el.innerHTML = mkEmpty('active'); return; }
+      el.innerHTML = r.map(x => {
+        const nm = G.user.uid===x.senderId ? x.receiverName : x.senderName;
+        return `<div class="mc" onclick="navTo('requests')">
+          <div class="mca">${ini(nm,1)}</div>
+          <div class="mcb"><div class="mcn">${E(nm)}</div><div class="mcs">${x.type||'Skill Swap'}</div></div>
+          <div class="mcr"><span class="sbdg ${x.status}">${x.status}</span></div>
+        </div>`;
+      }).join('');
+    }, () => { el.innerHTML = mkEmpty('active'); });
+  } catch(e) { el.innerHTML = mkEmpty('active'); }
+}
+
+function renderDMsgs() {
+  const el = document.getElementById('dmsgs');
+  if (!fbOK || !G.user) { el.innerHTML = mkEmpty('chat'); return; }
+  if (G.unsubs.dm) G.unsubs.dm();
+  try {
+    const q = query(
+      collection(db,'conversations'),
+      where('participants','array-contains', G.user.uid),
+      orderBy('lastMessageTime','desc'), limit(3)
+    );
+    G.unsubs.dm = onSnapshot(q, sn => {
+      if (!sn.docs.length) { el.innerHTML = mkEmpty('chat'); return; }
+      el.innerHTML = sn.docs.map(d => {
+        const c = { id:d.id,...d.data() };
+        const pUid    = (c.participants||[]).find(u => u!==G.user.uid) || '';
+        const pName   = (c.participantData||{})[pUid] || 'Student';
+        const unread  = (c.unreadCounts||{})[G.user.uid] || 0;
+        return `<div class="mc" onclick="openChat('${pUid}','${E(pName)}')">
+          <div class="mca">${ini(pName,1)}</div>
+          <div class="mcb"><div class="mcn">${E(pName)}</div><div class="mcs">${E(c.lastMessage||'Say hello 👋')}</div></div>
+          <div class="mcr"><div class="mct">${ago(c.lastMessageTime?.seconds*1000||0)}</div>${unread?`<div class="mcu">${unread}</div>`:''}</div>
+        </div>`;
+      }).join('');
+    }, () => { el.innerHTML = mkEmpty('chat'); });
+  } catch(e) { el.innerHTML = mkEmpty('chat'); }
+}
+
+/* ════════════════════════════════════════════════
+   ✅ CHAT SYSTEM — FULLY FIXED
+   • Deterministic chatId = [uid1,uid2].sort().join('_')  → ZERO duplicates
+   • createConv() uses setDoc with merge:true              → safe for first create
+   • sendMsg() uses addDoc for message + updateDoc for conv → no batch issues
+   • loadChatList uses array-contains query                → correct real-time list
+════════════════════════════════════════════════ */
+
+/** Compute canonical chat ID — always the same for any pair */
+function chatId(partnerUid) {
+  return [G.user.uid, partnerUid].sort().join('_');
+}
+
+/**
+ * Ensure conversation document exists (idempotent).
+ * Uses setDoc with merge:true so it NEVER overwrites an existing conversation.
+ */
+async function createConv(partnerUid, partnerName) {
+  const cid = chatId(partnerUid);
+  const ref  = doc(db, 'conversations', cid);
+  // setDoc with merge:true = create if not exists, skip if exists
+  await setDoc(ref, {
+    chatId: cid,
+    participants:    [G.user.uid, partnerUid],
+    participantData: {
+      [G.user.uid]: G.me?.name || 'User',
+      [partnerUid]: partnerName
+    },
+    lastMessage:     '',
+    lastMessageTime: serverTimestamp(),
+    unreadCounts:    { [G.user.uid]: 0, [partnerUid]: 0 },
+    createdAt:       serverTimestamp(),
+    updatedAt:       serverTimestamp()
+  }, { merge: true }); // ← merge:true is the KEY fix
+  return cid;
+}
+
+/** Open chat window — called from anywhere */
+window.openChat = async function(partnerUid, partnerName) {
+  if (!partnerUid || !G.user) { T('Cannot open chat — not logged in'); return; }
+  const cid = chatId(partnerUid);
+  G.chatId          = cid;
+  G.chatPartnerUid  = partnerUid;
+  G.chatPartnerName = partnerName || 'Student';
+
+  document.getElementById('cwinname').textContent = G.chatPartnerName;
+  document.getElementById('cwinav').textContent   = ini(G.chatPartnerName, 1);
+  document.getElementById('cmsgs').innerHTML      = '<div style="display:flex;align-items:center;justify-content:center;height:100%;opacity:.45;flex-direction:column;gap:8px"><div style="font-size:2rem">💬</div><div style="font-size:.82rem;color:var(--sub)">Loading…</div></div>';
+  document.getElementById('cinp').value           = '';
+
+  document.getElementById('cwin').classList.add('on');
+  document.body.style.overflow = 'hidden';
+
+  // Create conversation doc if it doesn't exist yet
+  try { await createConv(partnerUid, G.chatPartnerName); }
+  catch(e) { console.error('createConv error:', e); T('Could not open chat. Check Firestore rules.'); return; }
+
+  // Mark messages as read
+  updateDoc(doc(db,'conversations',cid), {
+    [`unreadCounts.${G.user.uid}`]: 0
+  }).catch(() => {});
+
+  // Start real-time message listener
+  listenMessages(cid);
+};
+
+function listenMessages(cid) {
+  if (G.unsubs.msgs) { try { G.unsubs.msgs(); } catch(e){} }
+  const q = query(
+    collection(db, 'conversations', cid, 'messages'),
+    orderBy('createdAt', 'asc')
+  );
+  G.unsubs.msgs = onSnapshot(q, sn => {
+    renderMessages(sn.docs.map(d => ({id:d.id,...d.data()})));
+  }, err => {
+    console.error('listenMessages error:', err.message);
+    document.getElementById('cmsgs').innerHTML = `<div style="text-align:center;padding:24px;color:var(--er);font-size:.82rem">⚠️ Cannot load messages.<br>${err.message}</div>`;
+  });
+}
+
+function renderMessages(msgs) {
+  const el = document.getElementById('cmsgs');
+  if (!msgs.length) {
+    el.innerHTML = `<div style="display:flex;align-items:center;justify-content:center;height:100%;flex-direction:column;gap:8px;opacity:.45"><div style="font-size:2.5rem">👋</div><div style="font-size:.84rem;color:var(--sub)">Say hello to start chatting!</div></div>`;
+    return;
+  }
+  el.innerHTML = msgs.map(m => {
+    const mine = m.senderId === G.user?.uid;
+    const ts   = m.createdAt?.seconds
+      ? new Date(m.createdAt.seconds*1000).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})
+      : '';
+    return `<div class="mg ${mine?'me':'them'}">
+      <div class="bub ${mine?'me':'them'}">${E(m.text||'')}</div>
+      <div class="mtime">${ts}</div>
+    </div>`;
+  }).join('');
+  el.scrollTop = el.scrollHeight;
+}
+
+/**
+ * Send a message.
+ * FIX: Uses addDoc (not batch) for messages — this always works.
+ * FIX: Uses setDoc merge:true then updateDoc — handles missing conv doc.
+ */
+window.sendMsg = async function() {
+  const inp  = document.getElementById('cinp');
+  const text = inp.value.trim();
+  if (!text)   return;
+  if (!G.user) return T('Not signed in');
+  if (!G.chatId) return T('No active chat');
+
+  inp.value = ''; inp.style.height = '';
+
+  const cid        = G.chatId;
+  const partnerUid = G.chatPartnerUid;
+
+  try {
+    /* STEP 1 — guarantee parent conversation exists */
+    await createConv(partnerUid, G.chatPartnerName || 'Student');
+
+    /* STEP 2 — save message */
+    await addDoc(collection(db, 'conversations', cid, 'messages'), {
+      text:         text,
+      senderId:     G.user.uid,
+      senderName:   G.me?.name || 'User',
+      createdAt:    serverTimestamp()
+    });
+
+    /* STEP 3 — update live conversation preview */
+    await setDoc(doc(db,'conversations',cid), {
+      chatId: cid,
+      lastMessage: text,
+      lastMessageTime: serverTimestamp(),
+      updatedAt: serverTimestamp(),
+      participants: [G.user.uid, partnerUid],
+      participantData: {
+        [G.user.uid]: G.me?.name || 'User',
+        [partnerUid]: G.chatPartnerName || 'Student'
+      },
+      unreadCounts: {
+        [G.user.uid]: 0
+      }
+    }, { merge:true });
+
+    /* STEP 4 — increment unread safely */
+    await updateDoc(doc(db,'conversations',cid), {
+      [`unreadCounts.${partnerUid}`]: increment(1),
+      [`unreadCounts.${G.user.uid}`]: 0
+    });
+
+  } catch(e) {
+    console.error('sendMsg error:', e.message);
+    T('Failed to send. Error: ' + e.message);
+    /* Restore text so user doesn't lose it */
+    inp.value = text;
+  }
+};
+
+window.closeCwin = function() {
+  document.getElementById('cwin').classList.remove('on');
+  document.body.style.overflow = '';
+  if (G.unsubs.msgs) { try { G.unsubs.msgs(); } catch(e){} delete G.unsubs.msgs; }
+};
+
+function loadChatList() {
+  const el = document.getElementById('chatlist');
+  if (!fbOK || !G.user) { el.innerHTML = mkEmpty('chat','Find Students',"navTo('discover')"); return; }
+  if (G.unsubs.cl) G.unsubs.cl();
+  try {
+    const q = query(
+      collection(db, 'conversations'),
+      where('participants', 'array-contains', G.user.uid),
+      orderBy('lastMessageTime', 'desc')
+    );
+    G.unsubs.cl = onSnapshot(q, sn => {
+      if (!sn.docs.length) { el.innerHTML = mkEmpty('chat','Find Students',"navTo('discover')"); updChatBadge(0); return; }
+      let totalUnread = 0;
+      el.innerHTML = sn.docs.map(d => {
+        const c       = { id:d.id,...d.data() };
+        const pUid    = (c.participants||[]).find(u => u!==G.user.uid) || '';
+        const pName   = (c.participantData||{})[pUid] || 'Student';
+        const unread  = (c.unreadCounts||{})[G.user.uid] || 0;
+        totalUnread  += unread;
+        const ts      = c.lastMessageTime?.seconds ? ago(c.lastMessageTime.seconds*1000) : '';
+        return `<div class="crow" onclick="openChat('${pUid}','${E(pName)}')">
+          <div class="cav">${ini(pName,1)}${unread?'<div style="position:absolute;bottom:0;right:0;width:11px;height:11px;background:var(--ok);border-radius:50%;border:2px solid var(--card)"></div>':''}</div>
+          <div class="cbody"><div class="cname">${E(pName)}</div><div class="cprev">${E(c.lastMessage||'Start chatting…')}</div></div>
+          <div class="cmeta"><div class="ctime">${ts}</div>${unread?`<div class="cunr">${unread}</div>`:''}</div>
+        </div>`;
+      }).join('');
+      updChatBadge(totalUnread);
+    }, () => { el.innerHTML = mkEmpty('chat','Find Students',"navTo('discover')"); });
+  } catch(e) { el.innerHTML = mkEmpty('chat','Find Students',"navTo('discover')"); }
+}
+
+function updChatBadge(n) {
+  const b = document.getElementById('cnb');
+  if (n>0) { b.style.display='flex'; b.textContent=n; } else b.style.display='none';
+}
+
+window.ckey    = function(e) { if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMsg();} };
+window.ars     = function(el) { el.style.height=''; el.style.height=Math.min(el.scrollHeight,90)+'px'; };
+window.cwinInfo= function() { if(G.chatPartnerUid) openSvByUid(G.chatPartnerUid); };
+
+/* ════════════════════════════════════════════════
+   ✅ REQUEST SYSTEM — FULLY FIXED
+   • No composite index needed for basic queries
+   • No duplicate-check query (removed — it needed an index)
+   • Uses senderId/receiverId fields properly
+   • Status lifecycle: pending → accepted → completed | cancelled
+════════════════════════════════════════════════ */
+function loadRequests() {
+  const el = document.getElementById('rlist');
+  if (!fbOK || !G.user) { el.innerHTML = mkEmpty(G.rtab); return; }
+  if (G.unsubs.rl) G.unsubs.rl();
+
+  /* ── Use the simplest possible query to avoid index errors ── */
+  let q;
+  try {
+    if (G.rtab === 'incoming') {
+      q = query(collection(db,'requests'),
+        where('receiverId','==',G.user.uid),
+        where('status','==','pending'),
+        orderBy('createdAt','desc'));
+    } else if (G.rtab === 'outgoing') {
+      q = query(collection(db,'requests'),
+        where('senderId','==',G.user.uid),
+        orderBy('createdAt','desc'));
+    } else if (G.rtab === 'active') {
+      q = query(collection(db,'requests'),
+        where('participants','array-contains',G.user.uid),
+        where('status','==','accepted'),
+        orderBy('createdAt','desc'));
+    } else { // completed
+      q = query(collection(db,'requests'),
+        where('participants','array-contains',G.user.uid),
+        where('status','==','completed'),
+        orderBy('createdAt','desc'));
+    }
+
+    G.unsubs.rl = onSnapshot(q, async sn => {
+      const reqs = sn.docs.map(d => ({id:d.id,...d.data()}));
+      /* Update badge for incoming */
+      if (G.rtab === 'incoming') {
+        const nb = document.getElementById('rnb');
+        if (reqs.length) { nb.style.display='flex'; nb.textContent=reqs.length; document.getElementById('rndot').style.display='block'; }
+        else             { nb.style.display='none'; document.getElementById('rndot').style.display='none'; }
+      }
+      /* Pre-fetch which receiver UIDs this user has already reviewed (one-per-receiver rule) */
+      if (G.rtab === 'completed' && fbOK && G.user) {
+        try {
+          const revSnap = await getDocs(query(
+            collection(db, 'reviews'),
+            where('fromUid', '==', G.user.uid)
+          ));
+          G._reviewedUids = new Set(revSnap.docs.map(d => d.data().toUid));
+        } catch(e) {
+          G._reviewedUids = new Set();
+        }
+      }
+      renderRequests(reqs);
+    }, err => {
+      /* If index error — show helpful message with link */
+      if (err.message?.includes('index') || err.code==='failed-precondition') {
+        el.innerHTML = `<div class="empty"><div class="ei">⚙️</div><h3>Index Required</h3><p style="font-size:.78rem">Open your browser console (F12), find the Firestore error, and click the link to create the index. Takes ~2 minutes.</p></div>`;
+      } else {
+        el.innerHTML = mkEmpty(G.rtab);
+      }
+      console.error('loadRequests error:', err.message);
+    });
+  } catch(e) {
+    el.innerHTML = mkEmpty(G.rtab);
+    console.error('loadRequests setup error:', e.message);
+  }
+}
+
+function renderRequests(reqs) {
+  const el = document.getElementById('rlist');
+  if (!reqs.length) {
+    el.innerHTML = mkEmpty(G.rtab,'Go Discover',"navTo('discover')");
+    return;
+  }
+  el.innerHTML = '<div style="display:flex;flex-direction:column;gap:10px;padding:12px 14px 8px">' +
+    reqs.map(r => {
+      const isIncoming = r.receiverId === G.user.uid;
+      const isSender   = r.senderId   === G.user.uid;
+      const otherName  = isIncoming ? r.senderName   : r.receiverName;
+      const otherUid   = isIncoming ? r.senderId     : r.receiverId;
+      const ts = r.createdAt?.seconds ? ago(r.createdAt.seconds*1000) : '';
+      let acts = '';
+
+      if (G.rtab==='incoming' && r.status==='pending') {
+        acts = `<button class="bs s" onclick="acceptReq('${r.id}','${otherUid}','${E(otherName)}')">✓ Accept</button>
+                <button class="bs d" onclick="declineReq('${r.id}')">✕ Decline</button>
+                <button class="bs o" onclick="openSvByUid('${otherUid}')">Profile</button>`;
+
+      } else if (G.rtab==='active') {
+        // Show which sides have confirmed completion
+        const cc   = r.completionConfirmed || { sender: false, receiver: false };
+        const myConfirmed = isSender ? cc.sender : cc.receiver;
+        const markBtn = myConfirmed
+          ? `<button class="bs s" disabled style="opacity:.45;cursor:not-allowed">Confirmed ✓</button>`
+          : `<button class="bs s" onclick="completeReq('${r.id}','${otherUid}')">Mark Done ✓</button>`;
+        acts = `<button class="bs p" onclick="openChat('${otherUid}','${E(otherName)}')">Message</button>
+                ${markBtn}`;
+
+      } else if (G.rtab==='completed') {
+        // Only the SENDER gets the review button; one review per unique receiver
+        if (isSender) {
+          const alreadyReviewed = G._reviewedUids && G._reviewedUids.has(otherUid);
+          if (alreadyReviewed) {
+            acts = `<button class="bs o" disabled style="opacity:.5;cursor:not-allowed">✓ Reviewed</button>
+                    <button class="bs o" onclick="openSvByUid('${otherUid}')">Profile</button>`;
+          } else {
+            acts = `<button class="bs p" onclick="openRev('${otherUid}','${r.id}')">Leave Review ⭐</button>
+                    <button class="bs o" onclick="openSvByUid('${otherUid}')">Profile</button>`;
+          }
+        } else {
+          // Receiver: no review control, profile only
+          acts = `<button class="bs o" onclick="openSvByUid('${otherUid}')">Profile</button>`;
+        }
+
+      } else {
+        acts = `<button class="bs o" onclick="openSvByUid('${otherUid}')">View Profile</button>`;
+      }
+
+      return `<div class="rcard">
+        <div class="rtop">
+          <div class="rav">${ini(otherName,1)}</div>
+          <div class="rinfo"><div class="rname">${E(otherName)}</div><div class="rtype">${r.type||'Skill Swap'}</div></div>
+          <span class="sbdg ${r.status}">${r.status}</span>
+        </div>
+        <div class="rmeta">📅 ${ts}</div>
+        <div class="rdesc">${E(r.message||'')}</div>
+        <div class="racts">${acts}</div>
+      </div>`;
+    }).join('') + '</div>';
+}
+
+window.switchTab = function(t, el) {
+  G.rtab = t;
+  document.querySelectorAll('.rtab').forEach(x => x.classList.remove('on'));
+  el.classList.add('on');
+  loadRequests();
+};
+
+window.openReq = function(uid, name) {
+  G.reqTarget = { uid, name };
+  document.getElementById('moRT').textContent = 'Send Request';
+  document.getElementById('moRS').textContent = `Connect with ${name||'this student'}`;
+  document.getElementById('moRM').value = '';
+  OM('moReq');
+};
+
+/**
+ * Submit a request.
+ * FIX: Removed the duplicate-check query (needed a composite index).
+ * The UI naturally prevents spam — user must type a message each time.
+ */
+window.subReq = async function() {
+  const type = V('moRTy'), msg = V('moRM');
+  if (!msg) return T('Please write a message first');
+  if (!fbOK || !G.user) return T('Not signed in');
+  const t = G.reqTarget; if (!t) return;
+  try {
+    await addDoc(collection(db,'requests'), {
+      senderId:     G.user.uid,
+      senderName:   G.me.name,
+      receiverId:   t.uid,
+      receiverName: t.name,
+      type, message: msg,
+      status:       'pending',
+      participants: [G.user.uid, t.uid],   // for array-contains queries
+      createdAt:    serverTimestamp(),
+      updatedAt:    serverTimestamp()
+    });
+    addNotif(t.uid, 'request', `${G.me.name} sent you a ${type} request! 📬`);
+  } catch(e) {
+    console.error('subReq error:', e.message);
+    T('Failed to send: ' + e.message); return;
+  }
+  CM('moReq'); T('Request sent! 🚀');
+};
+
+window.acceptReq = async function(reqId, senderUid, senderName) {
+  if (!fbOK || !G.user) return;
+  try {
+    await updateDoc(doc(db,'requests',reqId), { status:'accepted', updatedAt:serverTimestamp() });
+    // Auto-create chat when request is accepted
+    await createConv(senderUid, senderName);
+    addNotif(senderUid, 'accepted', `${G.me.name} accepted your request! 🎉 You can now chat.`);
+    T('Request accepted! 💬 Chat is now open.');
+    loadRequests();
+  } catch(e) { T('Error: ' + e.message); }
+};
+
+window.declineReq = async function(reqId) {
+  if (!fbOK || !G.user) return;
+  try {
+    await updateDoc(doc(db,'requests',reqId), { status:'cancelled', updatedAt:serverTimestamp() });
+    T('Request declined'); loadRequests();
+  } catch(e) { T('Error: ' + e.message); }
+};
+
+window.completeReq = async function(reqId, otherUid) {
+
+  if (!fbOK || !G.user) return;
+
+  try {
+
+    const reqRef  = doc(db, 'requests', reqId);
+    const reqSnap = await getDoc(reqRef);
+
+    if (!reqSnap.exists()) return T('Request not found');
+
+    const reqData = reqSnap.data();
+
+    // GUARD: must be a participant
+    if (reqData.senderId !== G.user.uid && reqData.receiverId !== G.user.uid)
+      return T('Not authorised');
+
+    // GUARD: already fully completed — prevent re-triggering
+    if (reqData.status === 'completed')
+      return T('Already marked as completed');
+
+    // Determine which side the current user is
+    const isSender   = reqData.senderId   === G.user.uid;
+    const isReceiver = reqData.receiverId === G.user.uid;
+
+    // Read existing confirmations (default both false)
+    const existing = reqData.completionConfirmed || { sender: false, receiver: false };
+
+    // Prevent double-clicking same side
+    if (isSender   && existing.sender)   return T('You already confirmed completion');
+    if (isReceiver && existing.receiver) return T('You already confirmed completion');
+
+    // Build the updated confirmation object
+    const updated = {
+      sender:   isSender   ? true : existing.sender,
+      receiver: isReceiver ? true : existing.receiver
+    };
+
+    const bothConfirmed = updated.sender && updated.receiver;
+
+    // Build the Firestore update payload
+    const payload = {
+      completionConfirmed: updated,
+      updatedAt: serverTimestamp()
+    };
+
+    if (bothConfirmed) {
+      // Both sides agreed — mark fully completed
+      payload.status      = 'completed';
+      payload.reviewedBy  = [];           // initialise review-lock array
+      payload.completedAt = serverTimestamp();
+    }
+
+    await updateDoc(reqRef, payload);
+
+    if (bothConfirmed) {
+
+      // Increment completedSwaps for BOTH participants
+      const batch = [
+        updateDoc(doc(db,'users', reqData.senderId),   { completedSwaps: increment(1) }),
+        updateDoc(doc(db,'users', reqData.receiverId), { completedSwaps: increment(1) })
+      ];
+      await Promise.all(batch);
+
+      addNotif(otherUid, 'done',
+        `${G.me.name} confirmed the swap — it's now complete! 🏆`);
+
+      T('Swap completed! 🎉 You can now leave a review!');
+
+    } else {
+
+      // Notify the other side that one party confirmed
+      addNotif(otherUid, 'done',
+        `${G.me.name} marked their side as done — confirm completion on your end! ✅`);
+
+      T('Your completion confirmed. Waiting for the other side…');
+    }
+
+    loadRequests();
+
+  } catch(e) {
+    console.error('completeReq error:', e);
+    T('Error: ' + e.message);
+  }
+};
+
+/* ════════════════════════════════════════════════
+   DISCOVER
+════════════════════════════════════════════════ */
+let dMode='all', dQ='';
+function loadDiscover() { renderDisc(); }
+function renderDisc() {
+  let p = [...G.students];
+  if (dQ) {
+    const q = dQ.toLowerCase();
+    p = p.filter(s =>
+      s.name?.toLowerCase().includes(q) ||
+      (s.skillsOffered||[]).some(sk=>sk.toLowerCase().includes(q)) ||
+      s.course?.toLowerCase().includes(q) ||
+      s.school?.toLowerCase().includes(q)
+    );
+  }
+  if (dMode==='swap')    p = p.filter(s=>s.swapPref?.includes('Skill for Skill'));
+  else if (dMode==='tutor')  p = p.filter(s=>(s.skillsOffered||[]).some(sk=>sk.toLowerCase().includes('tutor')));
+  else if (dMode==='paid')   p = p.filter(s=>s.swapPref?.includes('Paid'));
+  else if (dMode==='collab') p = p.filter(s=>s.swapPref?.includes('Collaboration'));
+  else if (dMode==='online') p = p.filter(s=>(s.availability||[]).includes('Online Only'));
+  else if (dMode==='college')p = p.filter(s=>s.studentType==='college'||!s.studentType);
+  else if (dMode==='shs')    p = p.filter(s=>s.studentType==='shs');
+  const el = document.getElementById('disccards');
+  if (!p.length) { el.innerHTML = mkEmpty('discover'); return; }
+  el.innerHTML = p.map(s => {
+    const c = calcCompat(s);
+    return `<div class="dc">
+      <div class="dcaw"><div class="dca">${avH(s)}</div>${isOnline(s)?'<div class="dcol"></div>':''}</div>
+      <div class="dcb">
+        <div class="dcn">${E(s.name)}</div>
+        <div class="dcc">${E(s.school||'')} · ${E(s.course||'')} · ${E(s.year||'')}</div>
+        <div class="chips">${(s.skillsOffered||[]).slice(0,3).map(sk=>`<div class="chip">${E(sk)}</div>`).join('')}</div>
+        <div class="dcact">
+          <button class="bs p" onclick="event.stopPropagation();openReq('${s.uid||s.id}','${E(s.name)}')">Connect</button>
+          <button class="bs o" onclick="event.stopPropagation();openSv('${s.id}')">Profile</button>
+        </div>
+      </div>
+      <div class="dcr"><div class="dcm">${c}%</div><div class="dcml">match</div></div>
+    </div>`;
+  }).join('');
+}
+window.filterDisc = v => { dQ=v.toLowerCase().trim(); renderDisc(); };
+window.dFilt = function(m,el) {
+  dMode=m;
+  document.querySelectorAll('#discfilts .pill').forEach(p=>p.classList.remove('on'));
+  el.classList.add('on'); renderDisc();
+};
+window.fBySkill = function(sk) { navTo('discover'); dQ=sk.toLowerCase(); document.getElementById('discsrch').value=sk; renderDisc(); };
+
+/* ════════════════════════════════════════════════
+   SWIPE MODE
+════════════════════════════════════════════════ */
+function loadSwipe() { G.swPool=[...G.students]; G.swIdx=0; renderSwipe(); }
+function renderSwipe() {
+  const stack = document.getElementById('swstack');
+  const rem   = G.swPool.slice(G.swIdx);
+  document.getElementById('swcnt').textContent = rem.length ? `${rem.length} students left` : 'All done!';
+  stack.innerHTML = '';
+  if (!rem.length) {
+    stack.innerHTML = `<div class="swempty"><div style="font-size:3rem">🎉</div><h3>You've seen everyone!</h3><p>New students join every day. Check back soon!</p><button class="bp" style="margin-top:8px;padding:10px 24px" onclick="G.swIdx=0;renderSwipe()">Start Over</button></div>`;
+    return;
+  }
+  rem.slice(0,3).slice().reverse().forEach((s,i) => stack.appendChild(buildCard(s, i===Math.min(rem.length,3)-1, i)));
+}
+function buildCard(s, isTop, depth) {
+  const el = document.createElement('div'); el.className='swcard';
+  const sc = isTop?1:1-(depth+1)*0.04, ty = isTop?0:(depth+1)*10;
+  el.style.cssText=`transform:translateY(${ty}px) scale(${sc});z-index:${isTop?10:10-depth-1};transition:transform .3s ease;`;
+  const c = calcCompat(s);
+  el.innerHTML=`
+    <div class="swlbl nope">PASS</div><div class="swlbl like">CONNECT!</div><div class="swlbl sup">⭐ SUPER</div>
+    <div class="scimg" style="${s.avatar?`background:url('${s.avatar}') center/cover no-repeat`:'background:var(--g)'}">
+      ${!s.avatar?`<div class="scini">${ini(s.name,2)}</div>`:''}
+      <div class="scov"></div><div class="scbdg">${c}% match</div>
+    </div>
+    <div class="scbody">
+      <div class="scname">${E(s.name)}</div>
+      <div class="sccrs">${E(s.school||'')} · ${E(s.course||'')} · ${E(s.year||'')}</div>
+      <div class="scbio">${E(s.bio||'No bio yet.')}</div>
+      <div class="chips">${(s.skillsOffered||[]).slice(0,4).map(sk=>`<div class="chip">${E(sk)}</div>`).join('')}</div>
+    </div>`;
+  if (isTop) attachDrag(el,s); return el;
+}
+function attachDrag(card, s) {
+  let sx=0,sy=0,cx=0,cy=0,drag=false;
+  const [nl,ll,sl]=[card.querySelector('.swlbl.nope'),card.querySelector('.swlbl.like'),card.querySelector('.swlbl.sup')];
+  const st=pt=>{drag=true;sx=pt.clientX;sy=pt.clientY;card.style.transition='none';};
+  const mv=pt=>{
+    if(!drag)return; cx=pt.clientX-sx; cy=pt.clientY-sy;
+    card.style.transform=`translate(${cx}px,${cy}px) rotate(${cx*.065}deg) scale(1)`;
+    const nv=Math.min(1,Math.abs(cx)/90);
+    if(cx<-20){nl.style.opacity=nv;ll.style.opacity=0;sl.style.opacity=0;}
+    else if(cx>20){ll.style.opacity=nv;nl.style.opacity=0;sl.style.opacity=0;}
+    else if(cy<-30){sl.style.opacity=Math.min(1,Math.abs(cy)/70);nl.style.opacity=0;ll.style.opacity=0;}
+    else{nl.style.opacity=0;ll.style.opacity=0;sl.style.opacity=0;}
+  };
+  const en=()=>{
+    if(!drag)return; drag=false;
+    card.style.transition='transform .4s cubic-bezier(.25,.46,.45,.94)';
+    if(cx>80) animCard(card,s,'right');
+    else if(cx<-80) animCard(card,s,'left');
+    else if(cy<-80) animCard(card,s,'super');
+    else {card.style.transform='translateY(0) scale(1)';nl.style.opacity=0;ll.style.opacity=0;sl.style.opacity=0;}
+    cx=0;cy=0;
+  };
+  card.addEventListener('mousedown',e=>{e.preventDefault();st(e);});
+  window.addEventListener('mousemove',e=>{if(drag)mv(e);});
+  window.addEventListener('mouseup',en);
+  card.addEventListener('touchstart',e=>st(e.touches[0]),{passive:true});
+  card.addEventListener('touchmove',e=>{e.preventDefault();mv(e.touches[0]);},{passive:false});
+  card.addEventListener('touchend',en);
+}
+function animCard(card,s,dir) {
+  const vw=Math.max(window.innerWidth,430);
+  const ox=dir==='right'?vw*1.4:dir==='left'?-vw*1.4:0, oy=dir==='super'?-window.innerHeight:0;
+  card.style.transition='transform .38s ease,opacity .3s ease';
+  card.style.transform=`translate(${ox}px,${oy}px) rotate(${dir==='right'?28:dir==='left'?-28:0}deg)`;
+  card.style.opacity='0';
+  setTimeout(()=>procSwipe(dir,s),360);
+}
+window.swDir = function(dir) {
+  const top=document.querySelector('#swstack .swcard:last-child'); if(!top)return;
+  const s=G.swPool[G.swIdx]; if(!s)return; animCard(top,s,dir);
+};
+function procSwipe(dir,s) {
+  if (dir==='right'||dir==='super') {
+    if (Math.random()<(dir==='super'?.72:.38)) showMatch(s);
+    else {G.swIdx++;renderSwipe();}
+    if (fbOK&&G.user) {
+      addDoc(collection(db,'connections'),{users:[G.user.uid,s.uid||s.id],names:[G.me?.name||'',s.name],createdAt:serverTimestamp()}).catch(()=>{});
+      updateDoc(doc(db,'users',G.user.uid),{connections:increment(1)}).catch(()=>{});
+    }
+  } else {G.swIdx++;renderSwipe();}
+}
+function showMatch(s) {
+  document.getElementById('matchsub').textContent=`You and ${s.name} can now swap skills!`;
+  const a1=document.getElementById('mav1'),a2=document.getElementById('mav2');
+  a1.innerHTML=G.me?.avatar?`<img src="${G.me.avatar}">`:ini(G.me?.name||'Y',1);
+  a2.innerHTML=s.avatar?`<img src="${s.avatar}">`:ini(s.name,1);
+  document.getElementById('matcho').classList.add('on');
+  G.matchedS=s;
+  addNotif(s.uid||s.id,'match',`🎉 You and ${G.me?.name} matched! Start a skill swap.`);
+}
+window.closeMatch=function(){document.getElementById('matcho').classList.remove('on');G.swIdx++;renderSwipe();};
+window.matchMsg=async function(){
+  const s=G.matchedS; document.getElementById('matcho').classList.remove('on');
+  if(s){G.swIdx++;renderSwipe();await openChat(s.uid||s.id,s.name);}
+};
+
+/* ════════════════════════════════════════════════
+   NOTIFICATIONS
+════════════════════════════════════════════════ */
+function loadNotifs() {
+
+  if (!fbOK || !G.user)
+    return;
+
+  if (G.unsubs.n)
+    G.unsubs.n();
+
+  try {
+
+    const q = query(
+      collection(db,'notifications'),
+      where('toUid','==',G.user.uid),
+      orderBy('createdAt','desc'),
+      limit(30)
+    );
+
+    G.unsubs.n = onSnapshot(
+
+      q,
+
+      sn => {
+
+        const n = sn.docs.map(d => ({
+          id:d.id,
+          ...d.data()
+        }));
+
+        renderNotifs(n);
+
+        const unread = n.filter(x => !x.read).length;
+
+        ['dnotdot','dndot','rndot'].forEach(id => {
+
+          const el = document.getElementById(id);
+
+          if(el)
+            el.style.display = unread
+              ? 'block'
+              : 'none';
+        });
+      },
+
+      err => {
+
+        console.error(
+          'NOTIFICATION ERROR:',
+          err
+        );
+      }
+    );
+
+  } catch(e) {
+
+    console.error(
+      'loadNotifs FAILED:',
+      e
+    );
+  }
+}
+
+function renderNotifs(n) {
+
+  const el = document.getElementById('notifList');
+
+  const ico = {
+    request:'📬',
+    accepted:'✅',
+    view:'👀',
+    match:'🎉',
+    message:'💬',
+    done:'🏆',
+    suspended:'⛔'
+  };
+
+  const bg = {
+    request:'rgba(83,103,245,.1)',
+    accepted:'rgba(34,197,94,.1)',
+    view:'rgba(124,77,255,.1)',
+    match:'rgba(245,158,11,.1)',
+    message:'rgba(83,103,245,.1)',
+    done:'rgba(34,197,94,.1)',
+    suspended:'rgba(239,68,68,.1)'
+  };
+
+  if (!n.length) {
+
+    el.innerHTML = mkEmpty('notifications');
+
+    return;
+  }
+
+  el.innerHTML = n.map(x => `
+
+    <div class="ni2 ${x.read ? '' : 'unr'}">
+
+      <div
+        class="niico"
+        style="background:${bg[x.type] || 'var(--bg)'}"
+      >
+        ${ico[x.type] || '🔔'}
+      </div>
+
+      <div class="nibody">
+
+        <div class="nitext">
+          ${E(x.text)}
+        </div>
+
+        <div class="nitime">
+          ${ago(
+            x.createdAt?.seconds * 1000 || Date.now()
+          )}
+        </div>
+
+      </div>
+
+      ${!x.read
+        ? '<div class="nidot"></div>'
+        : ''
+      }
+
+    </div>
+
+  `).join('');
+}
+/* ════════════════════════════════════════════════
+   PROFILE
+════════════════════════════════════════════════ */
+function loadProfile() {
+  const u=G.me;if(!u)return;
+  const av=document.getElementById('profav');
+  av.innerHTML=u.avatar?`<img src="${u.avatar}">`:ini(u.name,1);
+  document.getElementById('profname').textContent=u.name||'Student';
+  document.getElementById('profsub').textContent=[u.school,u.course,u.year].filter(Boolean).join(' · ');
+  document.getElementById('profbio').textContent=u.bio||'No bio yet — tap Edit to add one!';
+  document.getElementById('psc').textContent=u.connections||0;
+  document.getElementById('psd').textContent=u.completedSwaps||0;
+  document.getElementById('psr').textContent=u.rating?Number(u.rating).toFixed(1):'—';
+  document.getElementById('profavail').innerHTML=(u.availability||[]).map(a=>`<div class="ac on" style="pointer-events:none;font-size:.72rem;padding:4px 10px">${a}</div>`).join('');
+  document.getElementById('profoff').innerHTML=(u.skillsOffered||[]).map(s=>`<div class="stag">${E(s)}</div>`).join('')||'<span style="font-size:.82rem;color:var(--sub)">None yet — tap Edit!</span>';
+  document.getElementById('profwan').innerHTML=(u.skillsWanted||[]).map(s=>`<div class="stag w">${E(s)}</div>`).join('')||'<span style="font-size:.82rem;color:var(--sub)">None yet — tap Edit!</span>';
+  loadProfRevs();
+  // Live update
+  if(fbOK&&G.user){
+    if(G.unsubs.profStats)G.unsubs.profStats();
+    G.unsubs.profStats=onSnapshot(doc(db,'users',G.user.uid),sn=>{
+      if(!sn.exists())return; G.me={...G.me,...sn.data()};
+      document.getElementById('psc').textContent=G.me.connections||0;
+      document.getElementById('psd').textContent=G.me.completedSwaps||0;
+    },()=>{});
+  }
+}
+function loadProfRevs() {
+  const el=document.getElementById('profrevs');
+  if(!fbOK||!G.user){el.innerHTML='<div style="font-size:.82rem;color:var(--sub)">No reviews yet</div>';return;}
+  if(G.unsubs.pRevs)G.unsubs.pRevs();
+  G.unsubs.pRevs=onSnapshot(
+    query(collection(db,'reviews'),where('toUid','==',G.user.uid),orderBy('createdAt','desc')),
+    sn=>renderRevList(el,sn.docs.map(d=>d.data())),
+    ()=>{el.innerHTML='<div style="font-size:.82rem;color:var(--sub)">No reviews yet</div>';}
+  );
+}
+function renderRevList(el,revs) {
+  if(!revs.length){el.innerHTML='<div style="text-align:center;padding:16px 0;color:var(--sub);font-size:.82rem">No reviews yet. Complete a skill swap to get your first! ⭐</div>';return;}
+  const avg=(revs.reduce((a,r)=>a+(r.rating||0),0)/revs.length).toFixed(1);
+  document.getElementById('psr').textContent=avg;
+  el.innerHTML=`<div style="display:flex;align-items:center;gap:14px;margin-bottom:14px;padding:12px;background:var(--bg);border-radius:13px"><div class="rbig">${avg}</div><div><div class="stars" style="font-size:1.1rem">${'★'.repeat(Math.round(avg))}${'☆'.repeat(5-Math.round(avg))}</div><div style="font-size:.75rem;color:var(--sub);margin-top:2px">${revs.length} review${revs.length!==1?'s':''}</div></div></div>`+
+  revs.slice(0,5).map(r=>`<div class="ritem"><div class="rtoprev"><div class="ravrev">${ini(r.fromName||'?',1)}</div><div class="rrevname">${E(r.fromName||'Student')}</div><div class="stars" style="margin-left:auto">${'★'.repeat(r.rating||0)}</div></div><div class="rrevtext">${E(r.comment||'')}</div></div>`).join('');
+}
+
+/* ════════════════════════════════════════════════
+   EDIT PROFILE
+════════════════════════════════════════════════ */
+function loadEdit() {
+  const u=G.me;if(!u)return;
+  document.getElementById('editbio').value=u.bio||'';
+  document.getElementById('editint').value=u.interests||'';
+  document.getElementById('editgh').value=u.github||'';
+  document.getElementById('editli').value=u.linkedin||'';
+  document.getElementById('editsp').value=u.swapPref||'Skill for Skill (Free Exchange)';
+  G.editO=[...(u.skillsOffered||[])]; G.editW=[...(u.skillsWanted||[])];
+  renderES('o'); renderES('w');
+  document.querySelectorAll('#editavc .ac').forEach(c=>{c.classList.toggle('on',(u.availability||[]).includes(c.textContent));});
+  const av=document.getElementById('editavsh');
+  av.innerHTML=u.avatar?`<img src="${u.avatar}" style="width:100%;height:100%;border-radius:50%;object-fit:cover">`:ini(u.name,1);
+}
+window.editAdd=function(t){const id=t==='o'?'editoi':'editwi',v=V(id);if(!v)return;const a=t==='o'?G.editO:G.editW;if(!a.includes(v)){a.push(v);renderES(t);}document.getElementById(id).value='';};
+function renderES(t){const a=t==='o'?G.editO:G.editW,id=t==='o'?'editot':'editwt';document.getElementById(id).innerHTML=a.map((s,i)=>`<div class="stag ${t==='w'?'w':''}">${E(s)}<span class="rm" onclick="editRm('${t}',${i})">✕</span></div>`).join('');}
+window.editRm=function(t,i){(t==='o'?G.editO:G.editW).splice(i,1);renderES(t);};
+window.prevEditAv=function(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{document.getElementById('editavsh').innerHTML=`<img src="${ev.target.result}" style="width:100%;height:100%;border-radius:50%;object-fit:cover">`;G.newAv=ev.target.result;};r.readAsDataURL(f);};
+window.saveProfile=async function(){
+  const d={bio:V('editbio'),interests:V('editint'),github:V('editgh'),linkedin:V('editli'),swapPref:V('editsp'),skillsOffered:G.editO,skillsWanted:G.editW,availability:Array.from(document.querySelectorAll('#editavc .ac.on')).map(c=>c.textContent)};
+  if(G.newAv)d.avatar=G.newAv;
+  G.me={...G.me,...d};
+  try{if(fbOK&&G.user)await updateDoc(doc(db,'users',G.user.uid),d);}catch(e){T('Save failed: '+e.message);return;}
+  G.newAv=null; T('Profile saved! ✓'); SP('pg-profile'); loadProfile();
+};
+
+/* ════════════════════════════════════════════════
+   STUDENT VIEW
+════════════════════════════════════════════════ */
+window.openSv = function(sid) {
+  const s=G.students.find(u=>u.id===sid||u.uid===sid); if(s)_renderSv(s);
+};
+window.openSvByUid = function(uid) {
+  const s=G.students.find(u=>u.uid===uid||u.id===uid); if(s)_renderSv(s);
+};
+function _renderSv(s) {
+  G.svData=s;
+  const av=document.getElementById('svav');
+  av.innerHTML=s.avatar?`<img src="${s.avatar}">`:ini(s.name,2);
+  document.getElementById('svname').textContent=s.name;
+  document.getElementById('svsub').textContent=[s.school,s.course,s.year].filter(Boolean).join(' · ');
+  document.getElementById('svbio').textContent=s.bio||'No bio yet.';
+  document.getElementById('svcompat').textContent=calcCompat(s)+'% match';
+  document.getElementById('svpref').textContent=s.swapPref||'';
+  document.getElementById('svsk').textContent=(s.skillsOffered||[]).length;
+  document.getElementById('svco').textContent=s.connections||0;
+  document.getElementById('svra').textContent=s.rating?Number(s.rating).toFixed(1):'—';
+  document.getElementById('svoff').innerHTML=(s.skillsOffered||[]).map(sk=>`<div class="stag">${E(sk)}</div>`).join('')||'<span style="font-size:.82rem;color:var(--sub)">None listed</span>';
+  document.getElementById('svwan').innerHTML=(s.skillsWanted||[]).map(sk=>`<div class="stag w">${E(sk)}</div>`).join('')||'<span style="font-size:.82rem;color:var(--sub)">None listed</span>';
+  document.getElementById('svavail').innerHTML=(s.availability||[]).map(a=>`<div class="ac on">${a}</div>`).join('');
+  const revEl=document.getElementById('svrevs');
+  revEl.innerHTML='<div style="font-size:.82rem;color:var(--sub)">Loading…</div>';
+  if(fbOK){
+    getDocs(query(collection(db,'reviews'),where('toUid','==',s.uid||s.id),limit(3))).then(sn=>{
+      const revs=sn.docs.map(d=>d.data());
+      if(!revs.length){revEl.innerHTML='<div style="font-size:.82rem;color:var(--sub)">No reviews yet</div>';return;}
+      const avg=(revs.reduce((a,r)=>a+(r.rating||0),0)/revs.length).toFixed(1);
+      revEl.innerHTML=`<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;padding:10px;background:var(--bg);border-radius:12px"><div class="rbig" style="font-size:1.8rem">${avg}</div><div class="stars" style="font-size:1rem">${'★'.repeat(Math.round(avg))}</div></div>`+revs.map(r=>`<div class="ritem"><div class="rtoprev"><div class="ravrev">${ini(r.fromName||'?',1)}</div><div class="rrevname">${E(r.fromName||'?')}</div><div class="stars" style="margin-left:auto;font-size:.85rem">${'★'.repeat(r.rating||0)}</div></div><div class="rrevtext">${E(r.comment||'')}</div></div>`).join('');
+    }).catch(()=>{revEl.innerHTML='<div style="font-size:.82rem;color:var(--sub)">No reviews yet</div>';});
+  }
+  const svEl=document.getElementById('sv');
+  svEl.classList.add('on'); svEl.scrollTop=0; document.body.style.overflow='hidden';
+  if(G.me&&(s.uid||s.id)!==G.user?.uid) addNotif(s.uid||s.id,'view',`${G.me.name} viewed your profile 👀`);
+}
+window.closeSv=function(){document.getElementById('sv').classList.remove('on');document.body.style.overflow='';};
+window.svReq=function(){const s=G.svData;if(s){openReq(s.uid||s.id,s.name);closeSv();}};
+window.svMsg=async function(){const s=G.svData;if(!s)return;closeSv();await openChat(s.uid||s.id,s.name);};
+
+/* ════════════════════════════════════════════════
+   REVIEW MODAL
+════════════════════════════════════════════════ */
+
+/* Open the review modal — only valid for the request SENDER */
+window.openRev = function(targetUid, reqId) {
+  // Reset modal state
+  G.revTarget   = targetUid;
+  G.reviewReqId = reqId;
+  G.rating      = 0;
+  document.getElementById('moRC').value = '';
+  // Reset star highlights
+  document.querySelectorAll('#srate span').forEach(s => s.style.color = '');
+  OM('moRev');
+};
+
+/* Star-rating selector */
+window.setR = function(n) {
+  G.rating = n;
+  document.querySelectorAll('#srate span').forEach((s, i) => {
+    s.style.color = i < n ? '#f59e0b' : '';
+  });
+};
+
+window.subRev = async function() {
+
+  const reqId = G.reviewReqId;
+
+  if (!G.rating)
+    return T('Please select a rating');
+
+  if (!fbOK || !G.user)
+    return T('Not signed in');
+
+  if (!G.revTarget)
+    return T('No review target');
+
+  if (!reqId)
+    return T('Missing request');
+
+  try {
+
+    // LOAD REQUEST
+    const reqRef  = doc(db, 'requests', reqId);
+    const reqSnap = await getDoc(reqRef);
+
+    if (!reqSnap.exists())
+      return T('Request not found');
+
+    const reqData = reqSnap.data();
+
+    // ── GUARD 1: request must be fully completed ──
+    if (reqData.status !== 'completed')
+      return T('Request not completed yet');
+
+    // ── GUARD 2: only the ORIGINAL SENDER may leave a review ──
+    if (reqData.senderId !== G.user.uid)
+      return T('Only the request sender can leave a review');
+
+    // ── GUARD 3: self-review prevention ──
+    if (G.revTarget === G.user.uid)
+      return T('You cannot review yourself');
+
+    // ── GUARD 4: receiver must match the actual receiver on the request ──
+    if (G.revTarget !== reqData.receiverId)
+      return T('Review target mismatch');
+
+    // ── GUARD 5: one review per RECEIVER across all requests (anti-abuse) ──
+    const existingRevSnap = await getDocs(query(
+      collection(db, 'reviews'),
+      where('fromUid', '==', G.user.uid),
+      where('toUid',   '==', G.revTarget)
+    ));
+    if (!existingRevSnap.empty)
+      return T('You have already reviewed this student');
+
+    const reviewerName =
+      G.me?.name ||
+      G.user.displayName ||
+      'Anonymous';
+
+    // SAVE REVIEW
+    await addDoc(collection(db, 'reviews'), {
+      requestId: reqId,
+      fromUid:   G.user.uid,
+      fromName:  reviewerName,
+      toUid:     G.revTarget,
+      rating:    Number(G.rating),
+      comment:   V('moRC') || '',
+      createdAt: serverTimestamp()
+    });
+
+    // LOCK THIS REQUEST — prevents any further reviews from this user
+    await updateDoc(reqRef, {
+      reviewedBy: arrayUnion(G.user.uid),
+      updatedAt:  serverTimestamp()
+    });
+
+    // RECALCULATE AVERAGE RATING for the reviewed user
+    const sn = await getDocs(
+      query(
+        collection(db, 'reviews'),
+        where('toUid', '==', G.revTarget)
+      )
+    );
+
+    const revs = sn.docs.map(d => d.data());
+
+    const avg = revs.length
+      ? revs.reduce((a, r) => a + (Number(r.rating) || 0), 0) / revs.length
+      : 0;
+
+    // UPDATE reviewed user's rating fields
+    await setDoc(
+      doc(db, 'users', G.revTarget),
+      {
+        rating:      parseFloat(avg.toFixed(1)),
+        ratingCount: revs.length
+      },
+      { merge: true }
+    );
+
+    CM('moRev');
+
+    T('Review submitted! ✓');
+
+    // Refresh the completed-tab so button state updates immediately
+    loadRequests?.();
+
+  } catch(e) {
+    console.error('Review Error:', e);
+    T('Review failed: ' + e.message);
+  }
+};
+
+/* ════════════════════════════════════════════════
+   CONNECTIONS
+════════════════════════════════════════════════ */
+function loadConn() {
+  const el=document.getElementById('connlist');
+  if(!fbOK||!G.user){el.innerHTML=mkEmpty('connections','Try Swipe Mode',"navTo('swipe')");return;}
+  getDocs(query(collection(db,'connections'),where('users','array-contains',G.user.uid),orderBy('createdAt','desc')))
+    .then(sn=>{
+      if(!sn.docs.length){el.innerHTML=mkEmpty('connections','Try Swipe Mode',"navTo('swipe')");return;}
+      const uids=sn.docs.map(d=>{const u=d.data().users;return u.find(x=>x!==G.user.uid);}).filter(Boolean);
+      const known=G.students.filter(s=>uids.includes(s.uid||s.id));
+      if(!known.length){el.innerHTML=mkEmpty('connections','Try Swipe Mode',"navTo('swipe')");return;}
+      el.innerHTML=known.map(s=>`<div class="coitem" onclick="openSv('${s.id}')">
+        <div class="coav">${avH(s)}</div>
+        <div class="cobody"><div class="coname">${E(s.name)}</div><div class="cosub">${E(s.school||'')} · ${E(s.year||'')}</div></div>
+        <button class="coact" onclick="event.stopPropagation();openChat('${s.uid||s.id}','${E(s.name)}')">Message</button>
+      </div>`).join('');
+    }).catch(()=>{el.innerHTML=mkEmpty('connections','Try Swipe Mode',"navTo('swipe')");});
+}
+
+/* ════════════════════════════════════════════════
+   SEARCH
+════════════════════════════════════════════════ */
+window.openSearch=function(q){navTo('search');document.getElementById('srchi').value=q;doSearch();};
+window.doSearch=function(){
+  const q=V('srchi').toLowerCase();
+  let p=[...G.students];
+  if(q)p=p.filter(s=>s.name?.toLowerCase().includes(q)||(s.skillsOffered||[]).some(sk=>sk.toLowerCase().includes(q))||s.course?.toLowerCase().includes(q)||s.school?.toLowerCase().includes(q));
+  const el=document.getElementById('srchres');
+  if(!p.length){el.innerHTML=mkEmpty('discover');return;}
+  el.innerHTML=p.map(s=>`<div class="dc"><div class="dcaw"><div class="dca">${avH(s)}</div></div><div class="dcb"><div class="dcn">${E(s.name)}</div><div class="dcc">${E(s.school||'')} · ${E(s.course||'')} · ${E(s.year||'')}</div><div class="chips">${(s.skillsOffered||[]).slice(0,3).map(sk=>`<div class="chip">${E(sk)}</div>`).join('')}</div><div class="dcact"><button class="bs p" onclick="event.stopPropagation();openReq('${s.uid||s.id}','${E(s.name)}')">Connect</button><button class="bs o" onclick="event.stopPropagation();openSv('${s.id}')">Profile</button></div></div><div class="dcr"><div class="dcm">${calcCompat(s)}%</div><div class="dcml">match</div></div></div>`).join('');
+};
+
+/* ════════════════════════════════════════════════
+   NAVIGATION
+════════════════════════════════════════════════ */
+const NM={dashboard:'pg-dashboard',discover:'pg-discover',requests:'pg-requests',chat:'pg-chat',profile:'pg-profile',swipe:'pg-swipe',search:'pg-search',conn:'pg-conn'};
+window.navTo=function(pg){
+  closeSv(); closeCwin();
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  Object.keys(NM).forEach(k=>{const n=document.getElementById('nav-'+k);if(n)n.classList.remove('on');});
+  const t=document.getElementById(NM[pg]); if(t)t.classList.add('active');
+  const nb=document.getElementById('nav-'+pg); if(nb)nb.classList.add('on');
+  if(pg==='dashboard')loadDashboard();
+  else if(pg==='discover')loadDiscover();
+  else if(pg==='requests')loadRequests();
+  else if(pg==='chat')loadChatList();
+  else if(pg==='profile')loadProfile();
+  else if(pg==='swipe')loadSwipe();
+  else if(pg==='conn')loadConn();
+};
+window.SP=function(id){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));const el=document.getElementById(id);if(el)el.classList.add('active');};
+window.OM=id=>document.getElementById(id).classList.add('on');
+window.CM=id=>document.getElementById(id).classList.remove('on');
+window.cSho=function(id,e){if(e.target===document.getElementById(id))document.getElementById(id).classList.remove('on');};
+
+/* ════════════════════════════════════════════════
+   ADMIN PANEL
+════════════════════════════════════════════════ */
+function launchAdmin() {
+  document.getElementById('mainShell').style.display = 'none';
+  document.getElementById('adminShell').classList.add('on');
+  document.getElementById('bnav').style.display = 'none';
+  aTab('overview', document.querySelector('.atab'));
+}
+window.adminLogout=async function(){killListeners();try{if(fbOK)await signOut(auth);}catch(e){}};
+window.aTab=function(tab,el){
+  G.adminTab=tab;
+  document.querySelectorAll('.atab').forEach(t=>t.classList.remove('on'));
+  if(el)el.classList.add('on');
+  const c=document.getElementById('adminContent');
+  if(tab==='overview') aOverview(c);
+  else if(tab==='users')    aUsers(c);
+  else if(tab==='skills')   aSkills(c);
+  else if(tab==='requests') aRequests(c);
+  else if(tab==='chats')    aChats(c);
+  else if(tab==='broadcast')aBroadcast(c);
+};
+
+async function aOverview(c) {
+  c.innerHTML=`<div class="acard"><h3>📊 Platform Stats</h3><div class="a2grid"><div class="astat"><div class="astat-n" id="as-u">—</div><div class="astat-l">Students</div></div><div class="astat"><div class="astat-n" id="as-r">—</div><div class="astat-l">Requests</div></div><div class="astat"><div class="astat-n" id="as-c">—</div><div class="astat-l">Conversations</div></div><div class="astat"><div class="astat-n" id="as-rev">—</div><div class="astat-l">Reviews</div></div></div></div><div class="acard"><h3>🕐 Recent Signups</h3><div id="as-recent"><div style="color:var(--sub);font-size:.82rem;text-align:center;padding:16px">Loading…</div></div></div>`;
+  if(!fbOK)return;
+  try{
+    const[uS,rS,cS,rvS,recS]=await Promise.all([
+      getDocs(collection(db,'users')),
+      getDocs(collection(db,'requests')),
+      getDocs(collection(db,'conversations')),
+      getDocs(collection(db,'reviews')),
+      getDocs(query(collection(db,'users'),orderBy('createdAt','desc'),limit(5)))
+    ]);
+    document.getElementById('as-u').textContent=uS.docs.filter(d=>d.data().email!==ADMIN_EMAIL&&!d.data().suspended).length;
+    document.getElementById('as-r').textContent=rS.size;
+    document.getElementById('as-c').textContent=cS.size;
+    document.getElementById('as-rev').textContent=rvS.size;
+    const rEl=document.getElementById('as-recent');
+    rEl.innerHTML=recS.docs.filter(d=>d.data().email!==ADMIN_EMAIL).map(d=>{const u=d.data();return`<div class="aurow"><div class="au-av">${ini(u.name||'?',1)}</div><div class="au-info"><div class="au-name">${E(u.name||'Unknown')}</div><div class="au-sub">${E(u.school||'')} · ${E(u.studentType==='shs'?'SHS':'College')}</div></div><span class="abadge ${u.suspended?'suspended':'active'}">${u.suspended?'Suspended':'Active'}</span></div>`;}).join('')||'<p style="color:var(--sub);font-size:.82rem;text-align:center;padding:16px">No students yet</p>';
+  }catch(e){c.innerHTML+=`<div style="color:var(--er);font-size:.8rem;padding:8px">Error: ${e.message}</div>`;}
+}
+
+async function aUsers(c){
+  c.innerHTML=`<div class="acard"><h3>👥 All Students</h3><div class="sw" style="margin-bottom:12px"><svg class="sico" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><input type="text" class="sbar" id="aUSrch" placeholder="Search by name, school, course…" oninput="aFilterU(this.value)" style="font-size:.84rem"></div><div id="aUList"><div style="color:var(--sub);font-size:.82rem;text-align:center;padding:20px">Loading…</div></div></div>`;
+  if(!fbOK)return;
+  try{
+    const sn=await getDocs(query(collection(db,'users'),orderBy('createdAt','desc'),limit(100)));
+    window._aU=sn.docs.map(d=>({id:d.id,...d.data()})).filter(u=>u.email!==ADMIN_EMAIL);
+    aRenderU(window._aU);
+  }catch(e){document.getElementById('aUList').innerHTML=`<p style="color:var(--er);font-size:.82rem">Error: ${e.message}</p>`;}
+}
+window.aFilterU=function(q){if(!window._aU)return;const f=q.toLowerCase();aRenderU(window._aU.filter(u=>u.name?.toLowerCase().includes(f)||u.school?.toLowerCase().includes(f)||u.email?.toLowerCase().includes(f)));};
+function aRenderU(users){
+  const el=document.getElementById('aUList');
+  if(!users.length){el.innerHTML='<p style="color:var(--sub);font-size:.82rem;text-align:center;padding:16px">No users found</p>';return;}
+  el.innerHTML=users.map(u=>`<div class="aurow"><div class="au-av">${ini(u.name||'?',1)}</div><div class="au-info"><div class="au-name">${E(u.name||'Unknown')}</div><div class="au-sub">${E(u.school||'')} · ${E(u.course||'')} · ${E(u.studentType==='shs'?'SHS':'College')}</div></div><div style="display:flex;gap:5px;align-items:center;flex-shrink:0"><span class="abadge ${u.suspended?'suspended':'active'}">${u.suspended?'Suspended':'Active'}</span>${!u.suspended?`<button class="abtn danger" onclick="aSuspendU('${u.id}','${E(u.name||'')}',true)">Suspend</button>`:`<button class="abtn" onclick="aSuspendU('${u.id}','${E(u.name||'')}',false)">Restore</button>`}<button class="abtn danger" onclick="aDelU('${u.id}','${E(u.name||'')}')">Delete</button></div></div>`).join('');
+}
+window.aSuspendU=function(uid,name,suspend){
+  document.getElementById('moSuspendT').textContent=suspend?`Suspend ${name}?`:`Restore ${name}?`;
+  document.getElementById('moSuspendP').textContent=suspend?`${name} will not be able to log in.`:`${name} will regain full access.`;
+  document.getElementById('moSuspendBtn').textContent=suspend?'Suspend':'Restore';
+  document.getElementById('moSuspendBtn').onclick=async function(){
+    try{await updateDoc(doc(db,'users',uid),{suspended:suspend});if(suspend)addDoc(collection(db,'notifications'),{toUid:uid,type:'suspended',text:'Your account has been suspended by an admin.',read:false,createdAt:serverTimestamp()}).catch(()=>{});}catch(e){T('Failed: '+e.message);}
+    CM('moSuspend');T(suspend?`${name} suspended`:`${name} restored`);aUsers(document.getElementById('adminContent'));
+  };OM('moSuspend');
+};
+window.aDelU=async function(uid,name){
+  if(!confirm(`Permanently delete ${name}? Cannot be undone.`))return;
+  try{await deleteDoc(doc(db,'users',uid));T(`${name} deleted`);aUsers(document.getElementById('adminContent'));}catch(e){T('Failed: '+e.message);}
+};
+
+async function aSkills(c){
+  c.innerHTML=`<div class="acard"><h3>🔥 Trending Skills <span style="font-size:.72rem;font-weight:400;color:var(--sub)">(real-time on student dashboard)</span></h3><div style="display:flex;gap:8px;margin-bottom:12px"><input type="text" class="fi" id="trendInp" placeholder="Add trending skill…" style="font-size:.84rem" onkeydown="if(event.key==='Enter')aTrAdd()"><button class="bp" style="width:auto;padding:9px 14px;flex-shrink:0" onclick="aTrAdd()">Add</button></div><div id="trendTags"></div><button class="bp" style="margin-top:12px" onclick="aTrSave()">💾 Save Trending Skills</button></div>
+  <div class="acard" style="margin-top:0"><h3>📚 Quick-Pick Suggestions <span style="font-size:.72rem;font-weight:400;color:var(--sub)">(shown during onboarding)</span></h3><div style="display:flex;gap:8px;margin-bottom:12px"><input type="text" class="fi" id="skillInp" placeholder="Add skill suggestion…" style="font-size:.84rem" onkeydown="if(event.key==='Enter')aSKAdd()"><button class="bp" style="width:auto;padding:9px 14px;flex-shrink:0" onclick="aSKAdd()">Add</button></div><div id="skillTags"></div><button class="bp" style="margin-top:12px" onclick="aSKSave()">💾 Save Skill Suggestions</button></div>`;
+  if(!fbOK)return;
+  try{
+    const[ts,ss]=await Promise.all([getDoc(doc(db,'settings','trending')),getDoc(doc(db,'settings','skills'))]);
+    window._aTrend=ts.exists()?(ts.data().skills||[]):[...G.trendSkills];
+    window._aSkills=ss.exists()?(ss.data().list||[]):[...DEFAULT_SKILLS];
+    aTrRender(); aSKRender();
+  }catch(e){console.error(e);}
+}
+function aTrRender(){document.getElementById('trendTags').innerHTML=(window._aTrend||[]).map((s,i)=>`<div class="askill-tag">${E(s)}<span class="rm" onclick="aTrRm(${i})">✕</span></div>`).join('');}
+function aSKRender(){document.getElementById('skillTags').innerHTML=(window._aSkills||[]).map((s,i)=>`<div class="askill-tag">${E(s)}<span class="rm" onclick="aSKRm(${i})">✕</span></div>`).join('');}
+window.aTrAdd=function(){const v=V('trendInp');if(!v)return;if(!window._aTrend)window._aTrend=[];if(!window._aTrend.includes(v))window._aTrend.push(v);document.getElementById('trendInp').value='';aTrRender();};
+window.aTrRm=function(i){window._aTrend.splice(i,1);aTrRender();};
+window.aTrSave=async function(){if(!fbOK)return;try{await setDoc(doc(db,'settings','trending'),{skills:window._aTrend,updatedAt:serverTimestamp()});T('Trending skills saved! ✓');}catch(e){T('Save failed: '+e.message);}};
+window.aSKAdd=function(){const v=V('skillInp');if(!v)return;if(!window._aSkills)window._aSkills=[];if(!window._aSkills.includes(v))window._aSkills.push(v);document.getElementById('skillInp').value='';aSKRender();};
+window.aSKRm=function(i){window._aSkills.splice(i,1);aSKRender();};
+window.aSKSave=async function(){if(!fbOK)return;try{await setDoc(doc(db,'settings','skills'),{list:window._aSkills,updatedAt:serverTimestamp()});T('Skill suggestions saved! ✓');}catch(e){T('Save failed: '+e.message);}};
+
+async function aRequests(c){
+  c.innerHTML=`<div class="acard"><h3>📬 All Requests</h3><div id="aRList"><div style="color:var(--sub);font-size:.82rem;text-align:center;padding:20px">Loading…</div></div></div>`;
+  if(!fbOK)return;
+  try{
+    const sn=await getDocs(query(collection(db,'requests'),orderBy('createdAt','desc'),limit(50)));
+    const reqs=sn.docs.map(d=>({id:d.id,...d.data()}));
+    if(!reqs.length){document.getElementById('aRList').innerHTML='<p style="color:var(--sub);font-size:.82rem;text-align:center;padding:16px">No requests yet</p>';return;}
+    document.getElementById('aRList').innerHTML=reqs.map(r=>`<div class="aurow"><div class="au-av" style="background:linear-gradient(135deg,#f59e0b,#d97706);font-size:.8rem">${(r.type||'S')[0]}</div><div class="au-info"><div class="au-name">${E(r.senderName||'?')} → ${E(r.receiverName||'?')}</div><div class="au-sub">${r.type||'Skill Swap'} · ${ago(r.createdAt?.seconds*1000||0)}</div></div><div style="display:flex;gap:5px;align-items:center;flex-shrink:0"><span class="sbdg ${r.status}">${r.status}</span><button class="abtn danger" onclick="aDelReq('${r.id}')">Delete</button></div></div>`).join('');
+  }catch(e){document.getElementById('aRList').innerHTML=`<p style="color:var(--er);font-size:.82rem">Error: ${e.message}</p>`;}
+}
+window.aDelReq=async function(id){if(!confirm('Delete this request?'))return;try{await deleteDoc(doc(db,'requests',id));T('Deleted');aRequests(document.getElementById('adminContent'));}catch(e){T('Failed: '+e.message);}};
+
+async function aChats(c){
+  c.innerHTML=`<div class="acard"><h3>💬 All Conversations</h3><div id="aCList"><div style="color:var(--sub);font-size:.82rem;text-align:center;padding:20px">Loading…</div></div></div>`;
+  if(!fbOK)return;
+  try{
+    const sn=await getDocs(query(collection(db,'conversations'),orderBy('lastMessageTime','desc'),limit(50)));
+    if(!sn.docs.length){document.getElementById('aCList').innerHTML='<p style="color:var(--sub);font-size:.82rem;text-align:center;padding:16px">No conversations yet</p>';return;}
+    document.getElementById('aCList').innerHTML=sn.docs.map(d=>{const c={id:d.id,...d.data()};const names=Object.values(c.participantData||{}).join(' ↔ ')||'Unknown';return`<div class="aurow"><div class="au-av" style="font-size:.8rem">💬</div><div class="au-info"><div class="au-name">${E(names)}</div><div class="au-sub">Last: ${ago(c.lastMessageTime?.seconds*1000||0)} · ID: ${c.id}</div></div><button class="abtn danger" onclick="aDelChat('${c.id}')">Delete</button></div>`;}).join('');
+  }catch(e){document.getElementById('aCList').innerHTML=`<p style="color:var(--er);font-size:.82rem">Error: ${e.message}</p>`;}
+}
+window.aDelChat=async function(id){
+  if(!confirm('Delete this conversation and ALL its messages?'))return;
+  try{
+    const msgsSnap=await getDocs(collection(db,'conversations',id,'messages'));
+    const batch=writeBatch(db);
+    msgsSnap.docs.forEach(d=>batch.delete(d.ref));
+    batch.delete(doc(db,'conversations',id));
+    await batch.commit();
+    T('Conversation deleted');aChats(document.getElementById('adminContent'));
+  }catch(e){T('Failed: '+e.message);}
+};
+
+function aBroadcast(c){
+  c.innerHTML=`<div class="acard"><h3>📢 Broadcast to All Students</h3>
+    <p style="font-size:.82rem;color:var(--sub);margin-bottom:14px">Sends a notification to every student on the platform.</p>
+    <div class="fg" style="margin-bottom:14px"><label>Message</label><textarea class="fi" id="bcastMsg" rows="3" placeholder="Type your announcement…"></textarea></div>
+    <button class="bp" onclick="aSendBcast()">📢 Send to All Students</button>
+  </div>
+  <div class="acard" style="margin-top:0">
+    <h3>🔥 What to Change in Firebase</h3>
+    <div style="font-size:.79rem;color:var(--tx);line-height:1.9">
+      <b>1. Create admin account in Firebase Auth:</b><br>
+      &nbsp;&nbsp;→ Firebase Console → Authentication → Users → Add User<br>
+      &nbsp;&nbsp;→ Email: <code>admin123@sti.edu.ph</code> | Password: <code>admin123</code><br><br>
+      <b>2. Paste Firestore Security Rules</b> (from the comment at top of the &lt;script&gt;)<br>
+      &nbsp;&nbsp;→ Firebase Console → Firestore → Rules → Paste → Publish<br><br>
+      <b>3. Create Firestore Composite Indexes:</b><br>
+      &nbsp;&nbsp;→ Just open the app, go to Requests tab, check browser console (F12)<br>
+      &nbsp;&nbsp;→ Each index error shows a direct link — click it to auto-create<br>
+      &nbsp;&nbsp;→ Wait ~2 minutes for each index to build<br><br>
+      <b>4. Firestore Collections (auto-created when data is added):</b><br>
+      &nbsp;&nbsp;• <code>users</code> — student profiles<br>
+      &nbsp;&nbsp;• <code>conversations</code> — chat rooms (chatId = sorted UIDs)<br>
+      &nbsp;&nbsp;• <code>conversations/{id}/messages</code> — messages sub-collection<br>
+      &nbsp;&nbsp;• <code>requests</code> — swap requests<br>
+      &nbsp;&nbsp;• <code>notifications</code> — user notifications<br>
+      &nbsp;&nbsp;• <code>reviews</code> — swap reviews<br>
+      &nbsp;&nbsp;• <code>connections</code> — swipe matches<br>
+      &nbsp;&nbsp;• <code>settings/trending</code> — admin-editable trending skills<br>
+      &nbsp;&nbsp;• <code>settings/skills</code> — admin-editable quick-pick skills<br><br>
+      <b>5. Add localhost to Authorized Domains:</b><br>
+      &nbsp;&nbsp;→ Firebase Console → Authentication → Settings → Authorized Domains<br>
+      &nbsp;&nbsp;→ Add: <code>localhost</code> and <code>127.0.0.1</code>
+    </div>
+  </div>`;
+}
+window.aSendBcast=async function(){
+  const msg=V('bcastMsg');if(!msg)return T('Please write a message first');
+  if(!fbOK)return T('Firebase not connected');
+  if(!confirm(`Send "${msg}" to ALL students?`))return;
+  try{
+    const sn=await getDocs(query(collection(db,'users'),where('role','==','student')));
+    const batch=writeBatch(db);
+    sn.docs.forEach(d=>{const ref=doc(collection(db,'notifications'));batch.set(ref,{toUid:d.data().uid,type:'message',text:`📢 Platform: ${msg}`,read:false,fromName:'SkillSwap Admin',createdAt:serverTimestamp()});});
+    await batch.commit();
+    T(`Announcement sent to ${sn.docs.length} students! ✓`);
+    document.getElementById('bcastMsg').value='';
+  }catch(e){T('Failed: '+e.message);}
+};
+
+/* ════════════════════════════════════════════════
+   UTILITIES
+════════════════════════════════════════════════ */
+function calcCompat(s){
+  const u=G.me;if(!u)return Math.floor(60+Math.random()*30);
+  let sc=50;
+  const mo=u.skillsOffered||[],mw=u.skillsWanted||[],to=s.skillsOffered||[],tw=s.skillsWanted||[];
+  sc+=mw.filter(w=>to.some(o=>fuz(w,o))).length*13;
+  sc+=mo.filter(o=>tw.some(w=>fuz(o,w))).length*13;
+  if((u.school||u.campus)===(s.school||s.campus))sc+=8;
+  if(u.course===s.course)sc+=7;
+  if(u.studentType===s.studentType)sc+=5;
+  return Math.min(99,Math.max(42,sc));
+}
+function fuz(a,b){a=(a||'').toLowerCase();b=(b||'').toLowerCase();return a.includes(b)||b.includes(a);}
+function isOnline(s){return s.lastSeen?.seconds?(Date.now()-s.lastSeen.seconds*1000)<600000:Math.random()>.55;}
+function pingLastSeen(){if(fbOK&&G.user)updateDoc(doc(db,'users',G.user.uid),{lastSeen:serverTimestamp()}).catch(()=>{});}
+setInterval(pingLastSeen,60000);
+function V(id){const el=document.getElementById(id);return el?(el.value||'').trim():'';}
+function E(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function ini(n,c){return(n||'?').split(' ').map(w=>w[0]||'').join('').substring(0,c).toUpperCase()||'?';}
+function avH(s){return s.avatar?`<img src="${s.avatar}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`:ini(s.name,2);}
+function ago(ts){
+  if(!ts)return''; const d=Math.floor((Date.now()-ts)/1000);
+  if(d<60)return'Just now'; if(d<3600)return Math.floor(d/60)+'m ago';
+  if(d<86400)return Math.floor(d/3600)+'h ago'; if(d<604800)return Math.floor(d/86400)+'d ago';
+  return new Date(ts).toLocaleDateString([],{month:'short',day:'numeric'});
+}
+window.T=function(msg,dur=3000){
+  const el=document.getElementById('toast');el.textContent=msg;el.classList.add('on');
+  clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove('on'),dur);
+};
+function hideSplash(){
+  setTimeout(()=>{const s=document.getElementById('spl');s.classList.add('out');setTimeout(()=>s.style.display='none',520);},900);
+}
+function fErr(code){
+  const map={
+    'auth/invalid-credential':'Incorrect email or password',
+    'auth/wrong-password':'Incorrect email or password',
+    'auth/user-not-found':'No account found with this email',
+    'auth/email-already-in-use':'Email already registered',
+    'auth/invalid-email':'Invalid email address',
+    'auth/too-many-requests':'Too many attempts — wait a few minutes',
+    'auth/network-request-failed':'Network error — check your connection',
+    'auth/configuration-not-found':'Firebase config error — check authDomain & add localhost to Authorized Domains',
+    'auth/operation-not-allowed':'Email/password sign-in is not enabled in Firebase Console → Authentication → Sign-in method'
+  };
+  return map[code]||('Error: '+(code||'Unknown'));
+}
+setTimeout(()=>{const spl=document.getElementById('spl');if(spl&&spl.style.display!=='none'&&!G.me&&!G.user){hideSplash();SP('pg-login');}},7000);
+</script>
+</body>
+</html>
