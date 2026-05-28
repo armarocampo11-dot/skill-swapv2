@@ -497,9 +497,7 @@ select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
   <div class="auth">
     <div class="ahero"><div class="aicon">🎓</div><div class="alogo">SkillSwap</div><p>Connect with students everywhere.<br>Exchange skills. Grow together.</p></div>
     <div class="abody">
-      <div style="background:rgba(245,158,11,.09);border:1.5px solid rgba(245,158,11,.28);border-radius:12px;padding:10px 13px;font-size:.76rem;color:#92400e;line-height:1.6">
-        ⚡ <strong>Firebase Setup:</strong> Replace <code>YOUR_API_KEY</code> etc. in the &lt;script&gt; below. Add <strong>localhost</strong> &amp; <strong>127.0.0.1</strong> to Firebase Auth → Authorized Domains.
-      </div>
+      
       <div class="fg"><label>Email Address</label><input type="email" class="fi" id="lei" placeholder="you@email.com" autocomplete="email"></div>
       <div class="fg"><label>Password</label><input type="password" class="fi" id="lpw" placeholder="Your password" autocomplete="current-password"></div>
       <button class="bp" onclick="doLogin()">Sign In →</button>
@@ -2447,32 +2445,7 @@ function aBroadcast(c){
     <div class="fg" style="margin-bottom:14px"><label>Message</label><textarea class="fi" id="bcastMsg" rows="3" placeholder="Type your announcement…"></textarea></div>
     <button class="bp" onclick="aSendBcast()">📢 Send to All Students</button>
   </div>
-  <div class="acard" style="margin-top:0">
-    <h3>🔥 What to Change in Firebase</h3>
-    <div style="font-size:.79rem;color:var(--tx);line-height:1.9">
-      <b>1. Create admin account in Firebase Auth:</b><br>
-      &nbsp;&nbsp;→ Firebase Console → Authentication → Users → Add User<br>
-      &nbsp;&nbsp;→ Email: <code>admin123@sti.edu.ph</code> | Password: <code>admin123</code><br><br>
-      <b>2. Paste Firestore Security Rules</b> (from the comment at top of the &lt;script&gt;)<br>
-      &nbsp;&nbsp;→ Firebase Console → Firestore → Rules → Paste → Publish<br><br>
-      <b>3. Create Firestore Composite Indexes:</b><br>
-      &nbsp;&nbsp;→ Just open the app, go to Requests tab, check browser console (F12)<br>
-      &nbsp;&nbsp;→ Each index error shows a direct link — click it to auto-create<br>
-      &nbsp;&nbsp;→ Wait ~2 minutes for each index to build<br><br>
-      <b>4. Firestore Collections (auto-created when data is added):</b><br>
-      &nbsp;&nbsp;• <code>users</code> — student profiles<br>
-      &nbsp;&nbsp;• <code>conversations</code> — chat rooms (chatId = sorted UIDs)<br>
-      &nbsp;&nbsp;• <code>conversations/{id}/messages</code> — messages sub-collection<br>
-      &nbsp;&nbsp;• <code>requests</code> — swap requests<br>
-      &nbsp;&nbsp;• <code>notifications</code> — user notifications<br>
-      &nbsp;&nbsp;• <code>reviews</code> — swap reviews<br>
-      &nbsp;&nbsp;• <code>connections</code> — swipe matches<br>
-      &nbsp;&nbsp;• <code>settings/trending</code> — admin-editable trending skills<br>
-      &nbsp;&nbsp;• <code>settings/skills</code> — admin-editable quick-pick skills<br><br>
-      <b>5. Add localhost to Authorized Domains:</b><br>
-      &nbsp;&nbsp;→ Firebase Console → Authentication → Settings → Authorized Domains<br>
-      &nbsp;&nbsp;→ Add: <code>localhost</code> and <code>127.0.0.1</code>
-    </div>
+  
   </div>`;
 }
 window.aSendBcast=async function(){
