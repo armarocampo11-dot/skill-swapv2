@@ -1005,129 +1005,37 @@ window.doAdminLogin = async function() {
 };
 
 window.doSignup = async function() {
-
-  if (!fbOK)
-    return T('Firebase not configured — replace YOUR_API_KEY in the script');
-
-  const n  = V('sun'),
-        ca = V('suca'),
-        co = V('suco'),
-        yr = V('suyr'),
-        st = V('sutype'),
-        em = V('suem'),
-        pw = V('supw');
-
-  // REQUIRED FIELDS
-  if (!n || !ca || !co || !yr || !em || !pw)
-    return T('Please fill in all required fields');
-
-  // PASSWORD LENGTH
-  if (pw.length < 😎
-    return T('Password must be at least 8 characters');
-
-  // ✅ SCHOOL EMAIL VALIDATION
-  const schoolPattern =
-    /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.edu\.ph$/;
-
-  if (!schoolPattern.test(em.toLowerCase())) {
-
-    return T(
-      'Please use a valid school email (.edu.ph)'
-    );
-  }
-
+  if (!fbOK) return T('Firebase not configured — replace YOUR_API_KEY in the script');
+  const n=V('sun'),ca=V('suca'),co=V('suco'),yr=V('suyr'),st=V('sutype'),em=V('suem'),pw=V('supw');
+  if (!n||!ca||!co||!yr||!em||!pw) return T('Please fill in all required fields');
+  if (pw.length < 8) return T('Password must be at least 8 characters');
   try {
-
-    // CREATE ACCOUNT
-    const cr =
-      await createUserWithEmailAndPassword(
-        auth,
-        em,
-        pw
-      );
-
-    // UPDATE AUTH PROFILE
-    await updateProfile(cr.user, {
-      displayName: n
-    });
-
-    // USER DATA
+    const cr = await createUserWithEmailAndPassword(auth, em, pw);
+    await updateProfile(cr.user, { displayName: n });
     const data = {
-
-      name: n,
-      school: ca,
-      course: co,
-      year: yr,
-
+      name:n, school:ca, course:co, year:yr,
       studentType: st || 'college',
-
-      email: em,
-      uid: cr.user.uid,
-
-      skillsOffered: [],
-      skillsWanted: [],
-
-      bio: '',
-      avatar: '',
-      availability: [],
-
-      swapPref:
-        'Skill for Skill (Free Exchange)',
-
-      interests: '',
-      github: '',
-      linkedin: '',
-
-      connections: 0,
-      completedSwaps: 0,
-
-      rating: 0,
-      ratingCount: 0,
-
-      onboarded: false,
-      suspended: false,
-      role: 'student',
-
-      createdAt: serverTimestamp(),
-      lastSeen: serverTimestamp()
+      email:em, uid:cr.user.uid,
+      skillsOffered:[], skillsWanted:[],
+      bio:'', avatar:'', availability:[],
+      swapPref:'Skill for Skill (Free Exchange)',
+      interests:'', github:'', linkedin:'',
+      connections:0, completedSwaps:0,
+      rating:0, ratingCount:0,
+      onboarded:false, suspended:false, role:'student',
+      createdAt: serverTimestamp(), lastSeen: serverTimestamp()
     };
-
-    // SAVE USER
-    await setDoc(
-      doc(db,'users',cr.user.uid),
-      data
-    );
-
-    // STORE LOCAL USER
+    await setDoc(doc(db,'users',cr.user.uid), data);
     G.me = data;
-
-    // GO TO ONBOARDING
     SP('pg-ob');
-
-  } catch(err) {
-
-    T(
-      fErr(err.code || err.message)
-    );
-  }
+  } catch(err) { T(fErr(err.code || err.message)); }
 };
 
 window.doLogout = async function() {
-
-  CM('moOut');
-
-  killListeners();
-
-  try {
-
-    if (fbOK)
-      await signOut(auth);
-
-  } catch(e) {
-
-    console.error(e);
-  }
+  CM('moOut'); killListeners();
+  try { if(fbOK) await signOut(auth); } catch(e) {}
 };
+
 /* ════════════════════════════════════════════════
    TRENDING + SITE SKILLS (real-time from Firestore)
 ════════════════════════════════════════════════ */
